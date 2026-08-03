@@ -1,8 +1,13 @@
 from data import EDGES, GROUPS
-from objective import (calculate_capacity_penalty, calculate_conflict_penalty,
-                       calculate_distance_penalty, calculate_fairness_penalty,
-                       calculate_lateness_penalty, calculate_waiting_penalty,
-                       objective_function)
+from objective import (
+    calculate_capacity_penalty,
+    calculate_conflict_penalty,
+    calculate_distance_penalty,
+    calculate_fairness_penalty,
+    calculate_lateness_penalty,
+    calculate_waiting_penalty,
+    objective_function,
+)
 from simulation import simulate_flow
 
 
@@ -28,6 +33,7 @@ def print_penalties(state):
 
 def print_simulation(state):
     from simulation import arrival_time
+
     horizon = max(arrival_time(r, d) for (r, d) in state) + 1
     sim = simulate_flow(state)
     for minute in range(horizon):
@@ -42,7 +48,9 @@ def print_simulation(state):
 
 
 def print_summary(name, initial_cost, final_cost, iterations):
-    improvement = 0 if initial_cost == 0 else (initial_cost - final_cost) / initial_cost * 100
+    improvement = (
+        0 if initial_cost == 0 else (initial_cost - final_cost) / initial_cost * 100
+    )
     print(f"Algorithm       : {name}")
     print(f"Initial cost    : {initial_cost:.2f}")
     print(f"Final cost      : {final_cost:.2f}")
@@ -62,8 +70,10 @@ def print_search_visualization(name, state_history, cost_history, max_steps=25):
     for index in range(shown):
         cost = cost_history[index]
         width = int(round((cost - floor) / span * 36))
-        changed = "awal" if index == 0 else _changed_groups(
-            state_history[index - 1], state_history[index]
+        changed = (
+            "awal"
+            if index == 0
+            else _changed_groups(state_history[index - 1], state_history[index])
         )
         print(f"Iterasi {index:>3} | {cost:>8.2f} | {'#' * width:<36} | {changed}")
     if len(cost_history) > shown:

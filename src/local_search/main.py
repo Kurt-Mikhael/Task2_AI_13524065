@@ -1,12 +1,22 @@
 import random
 
-from algorithms import (genetic_algorithm, hill_climbing_basic,
-                        hill_climbing_sideways, hill_climbing_stochastic,
-                        random_restart_hill_climbing, simulated_annealing)
+from algorithms import (
+    genetic_algorithm,
+    hill_climbing_basic,
+    hill_climbing_sideways,
+    hill_climbing_stochastic,
+    random_restart_hill_climbing,
+    simulated_annealing,
+)
 from objective import objective_function
 from state import generate_initial_state
-from view import (print_penalties, print_search_visualization, print_simulation,
-                  print_state, print_summary)
+from view import (
+    print_penalties,
+    print_search_visualization,
+    print_simulation,
+    print_state,
+    print_summary,
+)
 
 random.seed(42)
 
@@ -73,7 +83,13 @@ def main():
     print("=" * 64)
     sa_state, sa_history = simulated_annealing(initial)
     print("Iterasi 0..9      : " + " ".join(f"{c:.2f}" for c in sa_history[:10]))
-    print("Tengah simulasi   : " + " ".join(f"{c:.2f}" for c in sa_history[len(sa_history) // 2:len(sa_history) // 2 + 5]))
+    print(
+        "Tengah simulasi   : "
+        + " ".join(
+            f"{c:.2f}"
+            for c in sa_history[len(sa_history) // 2 : len(sa_history) // 2 + 5]
+        )
+    )
     print("Akhir simulasi    : " + " ".join(f"{c:.2f}" for c in sa_history[-5:]))
     print(f"Total iterasi     : {len(sa_history)}")
     print("\n=== FINAL STATE (Simulated Annealing) ===")
@@ -94,12 +110,14 @@ def main():
     print()
     print_penalties(ga_state)
 
-    candidates = [("Basic Hill Climbing", basic_state),
-                  ("Sideways Move Hill Climbing", sideways_state),
-                  ("Stochastic Hill Climbing", stochastic_state),
-                  ("Random-Restart Hill Climbing", hc_state),
-                  ("Simulated Annealing", sa_state),
-                  ("Genetic Algorithm", ga_state)]
+    candidates = [
+        ("Basic Hill Climbing", basic_state),
+        ("Sideways Move Hill Climbing", sideways_state),
+        ("Stochastic Hill Climbing", stochastic_state),
+        ("Random-Restart Hill Climbing", hc_state),
+        ("Simulated Annealing", sa_state),
+        ("Genetic Algorithm", ga_state),
+    ]
     best_name, best_state = min(candidates, key=lambda t: objective_function(t[1]))
 
     print("\n" + "=" * 64)
@@ -127,7 +145,9 @@ def main():
         ("Genetic Algorithm", ga_state, len(ga_history)),
     ]
     for name, state, iters in summary_data:
-        print_summary(name, objective_function(initial), objective_function(state), iters)
+        print_summary(
+            name, objective_function(initial), objective_function(state), iters
+        )
 
 
 if __name__ == "__main__":

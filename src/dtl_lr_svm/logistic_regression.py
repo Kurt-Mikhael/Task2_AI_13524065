@@ -62,39 +62,37 @@ class LogisticRegressionScratch:
             order = rng.permutation(n_samples)
 
             for start in range(0, n_samples, self.batch_size):
-                idx = order[start:start + self.batch_size]
+                idx = order[start : start + self.batch_size]
                 X_batch = X[idx]
                 y_batch = y[idx]
                 weight_batch = sample_weights[idx]
 
-                probability = self._sigmoid(
-                    X_batch @ self.coef_ + self.intercept_
-                )
+                probability = self._sigmoid(X_batch @ self.coef_ + self.intercept_)
                 weighted_error = (probability - y_batch) * weight_batch
 
-                grad_w = (
-                    X_batch.T @ weighted_error / len(idx)
-                    + self.l2 * self.coef_
-                )
+                grad_w = X_batch.T @ weighted_error / len(idx) + self.l2 * self.coef_
                 grad_b = weighted_error.mean()
 
                 step += 1
                 m_w = beta1 * m_w + (1 - beta1) * grad_w
-                v_w = beta2 * v_w + (1 - beta2) * (grad_w ** 2)
+                v_w = beta2 * v_w + (1 - beta2) * (grad_w**2)
                 m_b = beta1 * m_b + (1 - beta1) * grad_b
-                v_b = beta2 * v_b + (1 - beta2) * (grad_b ** 2)
+                v_b = beta2 * v_b + (1 - beta2) * (grad_b**2)
 
-                m_w_hat = m_w / (1 - beta1 ** step)
-                v_w_hat = v_w / (1 - beta2 ** step)
-                m_b_hat = m_b / (1 - beta1 ** step)
-                v_b_hat = v_b / (1 - beta2 ** step)
+                m_w_hat = m_w / (1 - beta1**step)
+                v_w_hat = v_w / (1 - beta2**step)
+                m_b_hat = m_b / (1 - beta1**step)
+                v_b_hat = v_b / (1 - beta2**step)
 
                 self.coef_ -= self.learning_rate * m_w_hat / (np.sqrt(v_w_hat) + eps)
-                self.intercept_ -= self.learning_rate * m_b_hat / (np.sqrt(v_b_hat) + eps)
+                self.intercept_ -= (
+                    self.learning_rate * m_b_hat / (np.sqrt(v_b_hat) + eps)
+                )
 
             probability_full = self._sigmoid(X @ self.coef_ + self.intercept_)
             log_loss = -np.mean(
-                sample_weights * (
+                sample_weights
+                * (
                     y * np.log(probability_full + 1e-12)
                     + (1 - y) * np.log(1 - probability_full + 1e-12)
                 )

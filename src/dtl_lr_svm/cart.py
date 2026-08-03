@@ -54,9 +54,7 @@ class CARTClassifierScratch:
             n_features = max(1, int(np.sqrt(self.n_features_in_)))
         else:
             n_features = int(self.max_features)
-        return self.rng_.choice(
-            self.n_features_in_, size=n_features, replace=False
-        )
+        return self.rng_.choice(self.n_features_in_, size=n_features, replace=False)
 
     def _best_split(self, indices):
         y_node = self.y_[indices]
@@ -71,9 +69,7 @@ class CARTClassifierScratch:
             sorted_values = values[order]
             sorted_y = y_node[order]
 
-            candidate_positions = np.flatnonzero(
-                sorted_values[:-1] < sorted_values[1:]
-            )
+            candidate_positions = np.flatnonzero(sorted_values[:-1] < sorted_values[1:])
             candidate_positions = candidate_positions[
                 (candidate_positions + 1 >= self.min_samples_leaf)
                 & (n_node - (candidate_positions + 1) >= self.min_samples_leaf)
@@ -81,10 +77,12 @@ class CARTClassifierScratch:
             if len(candidate_positions) == 0:
                 continue
 
-            if self.max_thresholds is not None and len(candidate_positions) > self.max_thresholds:
+            if (
+                self.max_thresholds is not None
+                and len(candidate_positions) > self.max_thresholds
+            ):
                 selected = np.linspace(
-                    0, len(candidate_positions) - 1,
-                    self.max_thresholds, dtype=int
+                    0, len(candidate_positions) - 1, self.max_thresholds, dtype=int
                 )
                 candidate_positions = candidate_positions[selected]
 
@@ -100,8 +98,7 @@ class CARTClassifierScratch:
             gini_right = 2.0 * p_right * (1.0 - p_right)
 
             gains = parent_gini - (
-                (n_left / n_node) * gini_left
-                + (n_right / n_node) * gini_right
+                (n_left / n_node) * gini_left + (n_right / n_node) * gini_right
             )
 
             local_best = int(np.argmax(gains))
@@ -111,7 +108,8 @@ class CARTClassifierScratch:
 
             split_position = int(candidate_positions[local_best])
             threshold = float(
-                (sorted_values[split_position] + sorted_values[split_position + 1]) / 2.0
+                (sorted_values[split_position] + sorted_values[split_position + 1])
+                / 2.0
             )
             left_mask = values <= threshold
 

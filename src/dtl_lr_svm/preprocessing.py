@@ -11,13 +11,13 @@ class ScratchTabularPreprocessor:
             c for c in frame.columns if c not in self.numeric_cols_
         ]
 
-        self.medians_ = {
-            c: float(frame[c].median()) for c in self.numeric_cols_
-        }
-        numeric_matrix = np.column_stack([
-            frame[c].fillna(self.medians_[c]).astype(float).to_numpy()
-            for c in self.numeric_cols_
-        ])
+        self.medians_ = {c: float(frame[c].median()) for c in self.numeric_cols_}
+        numeric_matrix = np.column_stack(
+            [
+                frame[c].fillna(self.medians_[c]).astype(float).to_numpy()
+                for c in self.numeric_cols_
+            ]
+        )
         self.means_ = numeric_matrix.mean(axis=0)
         self.stds_ = numeric_matrix.std(axis=0)
         self.stds_[self.stds_ < 1e-12] = 1.0
@@ -33,19 +33,20 @@ class ScratchTabularPreprocessor:
         return self
 
     def transform(self, frame):
-        numeric_matrix = np.column_stack([
-            frame[c].fillna(self.medians_[c]).astype(float).to_numpy()
-            for c in self.numeric_cols_
-        ])
+        numeric_matrix = np.column_stack(
+            [
+                frame[c].fillna(self.medians_[c]).astype(float).to_numpy()
+                for c in self.numeric_cols_
+            ]
+        )
         numeric_matrix = (numeric_matrix - self.means_) / self.stds_
 
         blocks = [numeric_matrix]
         for c in self.categorical_cols_:
             values = frame[c].fillna("__MISSING__").astype(str).to_numpy()
-            one_hot = np.column_stack([
-                (values == category).astype(float)
-                for category in self.categories_[c]
-            ])
+            one_hot = np.column_stack(
+                [(values == category).astype(float) for category in self.categories_[c]]
+            )
             blocks.append(one_hot)
 
         return np.column_stack(blocks).astype(np.float64)
@@ -66,13 +67,13 @@ class ScratchNonlinearPreprocessor:
             c for c in frame.columns if c not in self.numeric_cols_
         ]
 
-        self.medians_ = {
-            c: float(frame[c].median()) for c in self.numeric_cols_
-        }
-        numeric = np.column_stack([
-            frame[c].fillna(self.medians_[c]).to_numpy(dtype=float)
-            for c in self.numeric_cols_
-        ])
+        self.medians_ = {c: float(frame[c].median()) for c in self.numeric_cols_}
+        numeric = np.column_stack(
+            [
+                frame[c].fillna(self.medians_[c]).to_numpy(dtype=float)
+                for c in self.numeric_cols_
+            ]
+        )
         self.means_ = numeric.mean(axis=0)
         self.stds_ = numeric.std(axis=0)
         self.stds_[self.stds_ < 1e-12] = 1.0
@@ -94,63 +95,71 @@ class ScratchNonlinearPreprocessor:
         self.quantile_thresholds_ = {}
         for c in self.threshold_cols_:
             values = frame[c].fillna(self.medians_[c]).to_numpy(dtype=float)
-            self.quantile_thresholds_[c] = np.unique(
-                np.quantile(values, quantile_grid)
-            )
+            self.quantile_thresholds_[c] = np.unique(np.quantile(values, quantile_grid))
 
         self.feature_names_ = list(self.numeric_cols_)
         for c in self.categorical_cols_:
-            self.feature_names_.extend([
-                f"{c}={category}" for category in self.categories_[c]
-            ])
+            self.feature_names_.extend(
+                [f"{c}={category}" for category in self.categories_[c]]
+            )
         for c in self.threshold_cols_:
-            self.feature_names_.extend([
-                f"{c}>q{i:02d}" for i in range(len(self.quantile_thresholds_[c]))
-            ])
+            self.feature_names_.extend(
+                [f"{c}>q{i:02d}" for i in range(len(self.quantile_thresholds_[c]))]
+            )
 
         if (
             "person_home_ownership" in self.categories_
             and "previous_loan_defaults_on_file" in self.categories_
         ):
-            self.feature_names_.extend([
-                f"home={h}|prev_default={d}"
-                for h in self.categories_["person_home_ownership"]
-                for d in self.categories_["previous_loan_defaults_on_file"]
-            ])
+            self.feature_names_.extend(
+                [
+                    f"home={h}|prev_default={d}"
+                    for h in self.categories_["person_home_ownership"]
+                    for d in self.categories_["previous_loan_defaults_on_file"]
+                ]
+            )
 
         for c in ["loan_percent_income", "loan_int_rate", "person_income"]:
-            if c in self.quantile_thresholds_ and "person_home_ownership" in self.categories_:
-                self.feature_names_.extend([
-                    f"{c}>q{i:02d}|home={h}"
-                    for i in range(len(self.quantile_thresholds_[c]))
-                    for h in self.categories_["person_home_ownership"]
-                ])
+            if (
+                c in self.quantile_thresholds_
+                and "person_home_ownership" in self.categories_
+            ):
+                self.feature_names_.extend(
+                    [
+                        f"{c}>q{i:02d}|home={h}"
+                        for i in range(len(self.quantile_thresholds_[c]))
+                        for h in self.categories_["person_home_ownership"]
+                    ]
+                )
         return self
 
     def transform(self, frame):
-        numeric = np.column_stack([
-            frame[c].fillna(self.medians_[c]).to_numpy(dtype=float)
-            for c in self.numeric_cols_
-        ])
+        numeric = np.column_stack(
+            [
+                frame[c].fillna(self.medians_[c]).to_numpy(dtype=float)
+                for c in self.numeric_cols_
+            ]
+        )
         blocks = [(numeric - self.means_) / self.stds_]
 
         categorical_blocks = {}
         for c in self.categorical_cols_:
             values = frame[c].fillna("__MISSING__").astype(str).to_numpy()
-            block = np.column_stack([
-                (values == category).astype(float)
-                for category in self.categories_[c]
-            ])
+            block = np.column_stack(
+                [(values == category).astype(float) for category in self.categories_[c]]
+            )
             categorical_blocks[c] = block
             blocks.append(block)
 
         threshold_blocks = {}
         for c in self.threshold_cols_:
             values = frame[c].fillna(self.medians_[c]).to_numpy(dtype=float)
-            block = np.column_stack([
-                (values > threshold).astype(float)
-                for threshold in self.quantile_thresholds_[c]
-            ])
+            block = np.column_stack(
+                [
+                    (values > threshold).astype(float)
+                    for threshold in self.quantile_thresholds_[c]
+                ]
+            )
             threshold_blocks[c] = block
             blocks.append(block)
 
@@ -170,8 +179,9 @@ class ScratchNonlinearPreprocessor:
                 if c in threshold_blocks:
                     threshold_block = threshold_blocks[c]
                     blocks.append(
-                        (threshold_block[:, :, None] * home[:, None, :])
-                        .reshape(len(frame), -1)
+                        (threshold_block[:, :, None] * home[:, None, :]).reshape(
+                            len(frame), -1
+                        )
                     )
 
         return np.column_stack(blocks).astype(np.float64)

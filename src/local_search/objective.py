@@ -42,9 +42,11 @@ def calculate_fairness_penalty(state):
 
 def objective_function(state):
     sim = simulate_flow(state)
-    return (WEIGHTS["capacity"] * calculate_capacity_penalty(sim)
-            + WEIGHTS["conflict"] * calculate_conflict_penalty(sim)
-            + WEIGHTS["late"] * calculate_lateness_penalty(state)
-            + WEIGHTS["waiting"] * calculate_waiting_penalty(state)
-            + WEIGHTS["distance"] * calculate_distance_penalty(state)
-            + WEIGHTS["fairness"] * calculate_fairness_penalty(state))
+    return (
+        WEIGHTS["capacity"] * calculate_capacity_penalty(sim)
+        + WEIGHTS["conflict"] * calculate_conflict_penalty(sim)
+        + WEIGHTS["late"] * calculate_lateness_penalty(state)
+        + WEIGHTS["waiting"] * calculate_waiting_penalty(state)
+        + WEIGHTS["distance"] * calculate_distance_penalty(state)
+        + WEIGHTS["fairness"] * calculate_fairness_penalty(state)
+    )

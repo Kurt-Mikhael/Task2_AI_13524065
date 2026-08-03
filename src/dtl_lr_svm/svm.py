@@ -44,7 +44,7 @@ class LinearSVMScratch:
             current_lr = self.learning_rate / (1.0 + 0.02 * epoch)
 
             for start in range(0, n_samples, self.batch_size):
-                idx = order[start:start + self.batch_size]
+                idx = order[start : start + self.batch_size]
                 X_batch = X[idx]
                 y_batch = y_signed[idx]
                 weight_batch = sample_weights[idx]
@@ -57,9 +57,7 @@ class LinearSVMScratch:
 
                 if np.any(active):
                     active_coefficient = weight_batch[active] * y_batch[active]
-                    grad_w -= (
-                        X_batch[active].T @ active_coefficient / len(idx)
-                    )
+                    grad_w -= X_batch[active].T @ active_coefficient / len(idx)
                     grad_b -= active_coefficient.sum() / len(idx)
 
                 self.coef_ -= current_lr * grad_w
@@ -67,9 +65,8 @@ class LinearSVMScratch:
 
             full_margin = y_signed * (X @ self.coef_ + self.intercept_)
             hinge = np.maximum(0.0, 1.0 - full_margin)
-            loss = (
-                0.5 * self.regularization * np.dot(self.coef_, self.coef_)
-                + np.mean(sample_weights * hinge)
+            loss = 0.5 * self.regularization * np.dot(self.coef_, self.coef_) + np.mean(
+                sample_weights * hinge
             )
             self.loss_history_.append(float(loss))
 

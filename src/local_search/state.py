@@ -17,7 +17,10 @@ def is_valid_state(state):
 
 def generate_initial_state():
     while True:
-        state = tuple((random.choice(g["alternatif"]), random.randint(0, MAX_DELAY)) for g in GROUPS)
+        state = tuple(
+            (random.choice(g["alternatif"]), random.randint(0, MAX_DELAY))
+            for g in GROUPS
+        )
         if is_valid_state(state):
             return state
 

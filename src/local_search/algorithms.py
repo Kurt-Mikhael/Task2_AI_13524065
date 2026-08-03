@@ -2,7 +2,12 @@ import math
 import random
 
 from objective import objective_function
-from state import generate_initial_state, generate_neighbors, is_valid_state, random_neighbor
+from state import (
+    generate_initial_state,
+    generate_neighbors,
+    is_valid_state,
+    random_neighbor,
+)
 
 
 def _search_result(current, costs, states, return_states):
@@ -33,8 +38,9 @@ def hill_climbing_basic(initial, max_iterations=1000, return_states=False):
     return _search_result(current, costs, states, return_states)
 
 
-def hill_climbing_sideways(initial, max_iterations=1000, max_sideways=10,
-                           return_states=False):
+def hill_climbing_sideways(
+    initial, max_iterations=1000, max_sideways=10, return_states=False
+):
     current = initial
     current_cost = objective_function(current)
     costs = [current_cost]
@@ -46,10 +52,7 @@ def hill_climbing_sideways(initial, max_iterations=1000, max_sideways=10,
         if not neighbors:
             break
         best_cost = min(objective_function(nbr) for nbr in neighbors)
-        candidates = [
-            nbr for nbr in neighbors
-            if objective_function(nbr) == best_cost
-        ]
+        candidates = [nbr for nbr in neighbors if objective_function(nbr) == best_cost]
         if best_cost > current_cost:
             break
         if best_cost == current_cost:
@@ -74,10 +77,7 @@ def hill_climbing_stochastic(initial, max_iterations=1000, return_states=False):
 
     for _ in range(max_iterations):
         neighbors = generate_neighbors(current)
-        improving = [
-            nbr for nbr in neighbors
-            if objective_function(nbr) < current_cost
-        ]
+        improving = [nbr for nbr in neighbors if objective_function(nbr) < current_cost]
         if not improving:
             break
         current = random.choice(improving)
@@ -92,8 +92,7 @@ def hill_climbing(initial, max_iterations=1000, return_states=False):
     return hill_climbing_basic(initial, max_iterations, return_states)
 
 
-def random_restart_hill_climbing(restarts=6, max_iterations=1000,
-                                 return_states=False):
+def random_restart_hill_climbing(restarts=6, max_iterations=1000, return_states=False):
     if restarts <= 0:
         raise ValueError("restarts harus lebih besar dari 0")
     best_state = None
@@ -161,7 +160,9 @@ def mutate(chromosome):
     return random_neighbor(chromosome)
 
 
-def genetic_algorithm(population_size=40, generations=60, mutation_rate=0.4, elite_size=4):
+def genetic_algorithm(
+    population_size=40, generations=60, mutation_rate=0.4, elite_size=4
+):
     population = initialize_population(population_size)
     history = []
     for _ in range(generations):
