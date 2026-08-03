@@ -52,7 +52,7 @@ Tugas ini meminta saya mengimplementasikan Decision Tree Learning, Logistic Regr
 
 Kompetisinya adalah \emph{AI Lab Recruitment Task 2}, klasifikasi biner tabular untuk kelayakan pinjaman. Setiap baris berisi karakteristik pemohon seperti \texttt{person\_age}, \texttt{person\_income}, \texttt{person\_home\_ownership}, \texttt{person\_emp\_length}, \texttt{loan\_amnt}, \texttt{loan\_int\_rate}, \texttt{loan\_percent\_income}, \texttt{credit\_score}, dan \texttt{previous\_loan\_defaults\_on\_file}. Targetnya \texttt{loan\_status} bernilai 0 atau 1 dengan kelas positif sebagai minoritas. Kompetisi memakai macro F1, rata rata F1 kelas 0 dan kelas 1, jadi performa di kelas mayoritas saja tidak cukup.
 
-Aturannya tegas: ketiga algoritma harus from scratch dan hanya boleh memakai library komputasi matematis seperti NumPy. Pandas hanya untuk membaca tabel, matplotlib untuk visualisasi, dan scikit-learn hanya sebagai pembanding sekaligus penyedia metrik. Tidak boleh ada ensemble method atau algoritma di luar yang disebutkan untuk submisi. File submisi harus berisi \texttt{person\_id} dan \texttt{loan\_status} dengan urutan identik terhadap test.
+Aturannya tegas. Ketiga algoritma harus from scratch dan hanya boleh memakai library komputasi matematis seperti NumPy. Pandas hanya untuk membaca tabel, matplotlib untuk visualisasi, dan scikit-learn hanya sebagai pembanding sekaligus penyedia metrik. Tidak boleh ada ensemble method atau algoritma di luar yang disebutkan untuk submisi. File submisi harus berisi \texttt{person\_id} dan \texttt{loan\_status} dengan urutan identik terhadap test.
 
 \section{Decision Tree Learning}
 
@@ -79,7 +79,7 @@ Logistic Regression dari scratch memakai sigmoid untuk menghasilkan probabilitas
 
 dengan objective weighted binary cross-entropy plus regularisasi L2. Kelas minoritas diberi bobot seimbang yang dihitung manual. Optimisasinya memakai mini-batch dengan optimizer Adam, yang nanti saya jelaskan lebih dalam di bagian bonus. Ada early stopping berbasis patience terhadap loss penuh per epoch, dan saya mencatat loss history untuk visualisasi proses training.
 
-Di v1, model linear mendapat bantuan berupa nonlinear feature expansion yang target-independent: basis threshold dari quantile pada fitur kunci seperti \texttt{loan\_percent\_income}, \texttt{loan\_int\_rate}, dan \texttt{credit\_score}, plus interaksi dengan \texttt{person\_home\_ownership}. Transformasi ini bukan model baru, prediktor akhirnya tetap Logistic Regression, dan cut-point quantile selalu dipelajari dari training fold saja.
+Di v1, model linear mendapat bantuan berupa nonlinear feature expansion yang target-independent. Basis threshold berasal dari quantile pada fitur kunci seperti \texttt{loan\_percent\_income}, \texttt{loan\_int\_rate}, dan \texttt{credit\_score}, plus interaksi dengan \texttt{person\_home\_ownership}. Transformasi ini bukan model baru, prediktor akhirnya tetap Logistic Regression, dan cut-point quantile selalu dipelajari dari training fold saja.
 
 \section{Support Vector Machine}
 
@@ -118,18 +118,18 @@ submission\_cart\_scratch.csv & CART scratch baseline & 0.84573 \\
 \label{tab:lb}
 \end{table}
 
-Satu hal yang jujur saya akui di write-up ini: audit train-only di v3 menunjukkan \texttt{person\_id} membawa struktur urutan yang kuat terhadap target, seperti terlihat di Gambar~\ref{fig:id}. Binning ID dengan lebar tetap menampilkan positive rate yang melompat antar blok. Eksperimen ID-aware lahir dari situ, sebagai sensitivity analysis, dan terbukti paling tinggi baik di OOF maupun leaderboard. Peningkatan ini bukan bukti bahwa ID adalah faktor kredit yang sah, melainkan bahwa split dataset ini mengandung source-order signal. Tidak ada aturan manual seperti \texttt{if person\_id > X then 1}; split terhadap ID murni dipelajari sendiri oleh CART.
+Satu hal yang perlu saya akui di write-up adalah audit train-only di v3 menunjukkan \texttt{person\_id} membawa struktur urutan yang kuat terhadap target, seperti terlihat di Gambar~\ref{fig:id}. Binning ID dengan lebar tetap menampilkan positive rate yang melompat antar blok. Eksperimen ID-aware lahir dari situ sebagai sensitivity analysis dan terbukti paling tinggi baik di OOF maupun leaderboard. Peningkatan ini bukan bukti bahwa ID adalah faktor kredit yang sah, melainkan bahwa split dataset ini mengandung source-order signal. Tidak ada aturan manual seperti \texttt{if person\_id > X then 1}; split terhadap ID murni dipelajari sendiri oleh CART.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.92\textwidth]{id_audit_train_only.png}
-\caption{Contoh audit train-only: positive rate melompat antar rentang person\_id}
+\caption{Contoh audit train-only - positive rate melompat antar rentang person\_id}
 \label{fig:id}
 \end{figure}
 
 \section{Percobaan yang Gagal}
 
-Tidak semuanya langsung naik. Beberapa pendekatan yang saya coba gagal atau tidak sesuai harapan:
+Tidak semuanya langsung naik. Beberapa pendekatan yang saya coba gagal atau tidak sesuai harapan.
 
 \begin{enumerate}
 \item \textbf{Threshold default dan class weight sekaligus.} Pada versi awal, LR dan SVM memakai balanced class weight lalu tetap di-threshold di 0.5 atau 0.0. Kompensasi kelasnya dobel dan hasilnya tidak optimal. Di versi robust class weight saya matikan dan biarkan threshold OOF yang menangani ketidakseimbangan, hasilnya lebih baik.
@@ -145,7 +145,7 @@ Masih banyak yang bisa dicoba jika waktu tidak terbatas. Saya ingin mencoba SVM 
 
 \section{Bonus}
 
-\subsection{Algoritma Optimasi Tambahan: Adam}
+\subsection{Algoritma Optimasi Tambahan - Adam}
 
 Optimasi tambahan di luar materi kelas yang saya pakai adalah Adam (Kingma dan Ba, 2015), dipakai untuk melatih Logistic Regression dari scratch. Kelas ini biasanya baru mengajarkan gradient descent biasa, dan Adam membedakan diri dengan menjaga estimasi momen pertama dan kedua dari gradien,
 
