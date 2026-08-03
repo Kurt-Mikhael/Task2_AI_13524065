@@ -1,0 +1,321 @@
+================================================================
+CAMPUSFLOW - PROOF OF CONCEPT
+Optimasi Pergerakan Kelompok Mahasiswa Menggunakan Local Search
+================================================================
+
+=== INITIAL STATE (random) ===
+Kelompok A  : Koridor Timur (delay 0)
+Kelompok B  : Koridor Tengah -> Koridor Timur (delay 1)
+Kelompok C  : Koridor Barat (delay 1)
+Kelompok D  : Koridor Selatan (delay 5)
+
+Capacity penalty : 50
+Conflict penalty : 0
+Lateness penalty : 0
+Waiting penalty  : 7
+Distance penalty : 10
+Fairness penalty : 3.69
+Total objective cost: 531.38
+
+=== VISUALISASI SIMULASI INITIAL STATE ===
+MENIT 0
+Koridor Timur  : [########..] 30/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [..........] 0/25
+Koridor Selatan : [..........] 0/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 1
+Koridor Timur  : [########..] 30/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [########..] 20/25
+Koridor Selatan : [..........] 0/35
+Koridor Tengah : [##########] 25/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 2
+Koridor Timur  : [..........] 0/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [########..] 20/25
+Koridor Selatan : [..........] 0/35
+Koridor Tengah : [##########] 25/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 3
+Koridor Timur  : [######....] 25/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [..........] 0/25
+Koridor Selatan : [..........] 0/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 4
+Koridor Timur  : [######....] 25/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [..........] 0/25
+Koridor Selatan : [..........] 0/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 5
+Koridor Timur  : [..........] 0/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [..........] 0/25
+Koridor Selatan : [##########] 35/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 6
+Koridor Timur  : [..........] 0/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [..........] 0/25
+Koridor Selatan : [##########] 35/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 7
+Koridor Timur  : [..........] 0/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [..........] 0/25
+Koridor Selatan : [..........] 0/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+
+================================================================
+1. VARIAN HILL-CLIMBING
+================================================================
+
+Basic (Steepest-Ascent)
+Cost: 531.38 -> 29.38 -> 24.50 -> 20.38 -> 17.00 -> 14.38 -> 12.50 -> 10.38 -> 8.00
+
+=== VISUALISASI PENCARIAN: Basic (Steepest-Ascent) ===
+Iterasi   0 |   531.38 | #################################### | awal
+Iterasi   1 |    29.38 | #                                    | kelompok 2
+Iterasi   2 |    24.50 | #                                    | kelompok 4
+Iterasi   3 |    20.38 | #                                    | kelompok 4
+Iterasi   4 |    17.00 | #                                    | kelompok 4
+Iterasi   5 |    14.38 |                                      | kelompok 4
+Iterasi   6 |    12.50 |                                      | kelompok 2
+Iterasi   7 |    10.38 |                                      | kelompok 3
+Iterasi   8 |     8.00 |                                      | kelompok 4
+
+Sideways Move
+Cost: 531.38 -> 29.38 -> 24.50 -> 20.38 -> 17.00 -> 14.38 -> 12.50 -> 10.38 -> 8.00 -> 8.00 -> 8.00 -> 8.00 -> 8.00 -> 8.00 -> 8.00 -> 8.00 -> 8.00 -> 8.00 -> 8.00
+
+=== VISUALISASI PENCARIAN: Sideways Move ===
+Iterasi   0 |   531.38 | #################################### | awal
+Iterasi   1 |    29.38 | #                                    | kelompok 2
+Iterasi   2 |    24.50 | #                                    | kelompok 4
+Iterasi   3 |    20.38 | #                                    | kelompok 4
+Iterasi   4 |    17.00 | #                                    | kelompok 4
+Iterasi   5 |    14.38 |                                      | kelompok 4
+Iterasi   6 |    12.50 |                                      | kelompok 2
+Iterasi   7 |    10.38 |                                      | kelompok 3
+Iterasi   8 |     8.00 |                                      | kelompok 4
+Iterasi   9 |     8.00 |                                      | tidak berubah
+Iterasi  10 |     8.00 |                                      | tidak berubah
+Iterasi  11 |     8.00 |                                      | tidak berubah
+Iterasi  12 |     8.00 |                                      | tidak berubah
+Iterasi  13 |     8.00 |                                      | tidak berubah
+Iterasi  14 |     8.00 |                                      | tidak berubah
+Iterasi  15 |     8.00 |                                      | tidak berubah
+Iterasi  16 |     8.00 |                                      | tidak berubah
+Iterasi  17 |     8.00 |                                      | tidak berubah
+Iterasi  18 |     8.00 |                                      | tidak berubah
+
+Stochastic
+Cost: 531.38 -> 526.50 -> 525.38 -> 524.00 -> 22.00 -> 17.38 -> 13.50 -> 10.38 -> 8.00
+
+=== VISUALISASI PENCARIAN: Stochastic ===
+Iterasi   0 |   531.38 | #################################### | awal
+Iterasi   1 |   526.50 | #################################### | kelompok 4
+Iterasi   2 |   525.38 | #################################### | kelompok 2
+Iterasi   3 |   524.00 | ###################################  | kelompok 3
+Iterasi   4 |    22.00 | #                                    | kelompok 2
+Iterasi   5 |    17.38 | #                                    | kelompok 4
+Iterasi   6 |    13.50 |                                      | kelompok 4
+Iterasi   7 |    10.38 |                                      | kelompok 4
+Iterasi   8 |     8.00 |                                      | kelompok 4
+
+Random Restart
+Restart 1: 14784.38 -> 6532.38 -> 30.38 -> 27.00 -> 24.38 -> 21.50 -> 19.38 -> 17.00 -> 14.38 -> 12.50 -> 10.38 -> 8.00
+Restart 2: 7252.50 -> 350.50 -> 46.50 -> 43.38 -> 41.00 -> 38.38 -> 36.50 -> 34.38 -> 32.00 -> 30.38 -> 28.50 -> 26.38 -> 24.00 -> 22.38 -> 20.50 -> 18.38 -> 16.00 -> 14.38 -> 12.50 -> 10.38 -> 8.00
+Restart 3: 1978.38 -> 1600.50 -> 348.50 -> 44.50 -> 42.38 -> 40.00 -> 38.38 -> 36.50 -> 34.38 -> 32.00 -> 30.38 -> 28.50 -> 26.38 -> 24.00 -> 22.38 -> 20.50 -> 18.38 -> 16.00 -> 14.38 -> 12.50 -> 10.38 -> 8.00
+Restart 4: 429.00 -> 49.38 -> 44.50 -> 40.38 -> 36.38 -> 32.00 -> 28.38 -> 24.50 -> 21.38 -> 18.00 -> 15.38 -> 12.50 -> 10.38 -> 8.00
+Restart 5: 20535.38 -> 533.38 -> 529.38 -> 27.38 -> 25.00 -> 22.38 -> 20.50 -> 18.38 -> 16.00 -> 14.38 -> 12.50 -> 10.38 -> 8.00
+Restart 6: 1296.50 -> 44.50 -> 42.38 -> 40.00 -> 38.38 -> 36.50 -> 34.38 -> 32.00 -> 30.38 -> 28.50 -> 26.38 -> 24.00 -> 22.38 -> 20.50 -> 18.38 -> 16.00 -> 14.38 -> 12.50 -> 10.38 -> 8.00
+
+Best cost setelah 6 restart : 8.00
+
+=== VISUALISASI PENCARIAN: Random Restart ===
+Iterasi   0 | 14784.38 | #################################### | awal
+Iterasi   1 |  6532.38 | ################                     | kelompok 1
+Iterasi   2 |    30.38 |                                      | kelompok 4
+Iterasi   3 |    27.00 |                                      | kelompok 4
+Iterasi   4 |    24.38 |                                      | kelompok 2
+Iterasi   5 |    21.50 |                                      | kelompok 4
+Iterasi   6 |    19.38 |                                      | kelompok 2
+Iterasi   7 |    17.00 |                                      | kelompok 3
+Iterasi   8 |    14.38 |                                      | kelompok 4
+Iterasi   9 |    12.50 |                                      | kelompok 2
+Iterasi  10 |    10.38 |                                      | kelompok 3
+Iterasi  11 |     8.00 |                                      | kelompok 4
+
+=== FINAL STATE (Hill Climbing) ===
+Kelompok A  : Koridor Timur (delay 0)
+Kelompok B  : Koridor Utara (delay 0)
+Kelompok C  : Koridor Barat (delay 0)
+Kelompok D  : Koridor Selatan (delay 0)
+
+Capacity penalty : 0
+Conflict penalty : 0
+Lateness penalty : 0
+Waiting penalty  : 0
+Distance penalty : 8
+Fairness penalty : 0.00
+Total objective cost: 8.00
+
+================================================================
+2. SIMULATED ANNEALING
+================================================================
+Iterasi 0..9      : 29.38 29.38 29.38 35.00 35.00 35.00 35.00 35.00 35.00 34.38
+Tengah simulasi   : 21.38 25.38 25.38 25.38 25.38
+Akhir simulasi    : 8.00 8.00 8.00 8.00 8.00
+Total iterasi     : 1094
+
+=== FINAL STATE (Simulated Annealing) ===
+Kelompok A  : Koridor Timur (delay 0)
+Kelompok B  : Koridor Utara (delay 0)
+Kelompok C  : Koridor Barat (delay 0)
+Kelompok D  : Koridor Selatan (delay 0)
+
+Capacity penalty : 0
+Conflict penalty : 0
+Lateness penalty : 0
+Waiting penalty  : 0
+Distance penalty : 8
+Fairness penalty : 0.00
+Total objective cost: 8.00
+
+================================================================
+3. GENETIC ALGORITHM
+================================================================
+Best fitness per generasi (setiap 10):
+Generasi 0    : 36.50
+Generasi 10   : 8.00
+Generasi 20   : 8.00
+Generasi 30   : 8.00
+Generasi 40   : 8.00
+Generasi 50   : 8.00
+Generasi 59   : 8.00
+
+=== FINAL STATE (Genetic Algorithm) ===
+Kelompok A  : Koridor Timur (delay 0)
+Kelompok B  : Koridor Utara (delay 0)
+Kelompok C  : Koridor Barat (delay 0)
+Kelompok D  : Koridor Selatan (delay 0)
+
+Capacity penalty : 0
+Conflict penalty : 0
+Lateness penalty : 0
+Waiting penalty  : 0
+Distance penalty : 8
+Fairness penalty : 0.00
+Total objective cost: 8.00
+
+================================================================
+4. RINGKASAN PERBANDINGAN ALGORITMA
+================================================================
+Basic Hill Climbing            : cost akhir 8.00
+Sideways Move Hill Climbing    : cost akhir 8.00
+Stochastic Hill Climbing       : cost akhir 8.00
+Random-Restart Hill Climbing   : cost akhir 8.00
+Simulated Annealing            : cost akhir 8.00
+Genetic Algorithm              : cost akhir 8.00
+
+Solusi terbaik: Basic Hill Climbing
+
+=== FINAL STATE (solusi terbaik) ===
+Kelompok A  : Koridor Timur (delay 0)
+Kelompok B  : Koridor Utara (delay 0)
+Kelompok C  : Koridor Barat (delay 0)
+Kelompok D  : Koridor Selatan (delay 0)
+
+Capacity penalty : 0
+Conflict penalty : 0
+Lateness penalty : 0
+Waiting penalty  : 0
+Distance penalty : 8
+Fairness penalty : 0.00
+Total objective cost: 8.00
+
+=== VISUALISASI SIMULASI FINAL STATE ===
+MENIT 0
+Koridor Timur  : [########..] 30/40
+Koridor Utara  : [########..] 25/30
+Koridor Barat  : [########..] 20/25
+Koridor Selatan : [##########] 35/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 1
+Koridor Timur  : [########..] 30/40
+Koridor Utara  : [########..] 25/30
+Koridor Barat  : [########..] 20/25
+Koridor Selatan : [##########] 35/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+MENIT 2
+Koridor Timur  : [..........] 0/40
+Koridor Utara  : [..........] 0/30
+Koridor Barat  : [..........] 0/25
+Koridor Selatan : [..........] 0/35
+Koridor Tengah : [..........] 0/20
+Aula Timur     : [..........] 0/30
+Koridor Kampus : [..........] 0/20
+Koridor Lapangan : [..........] 0/25
+
+=== RINGKASAN HASIL ===
+Algorithm       : Basic Hill Climbing
+Initial cost    : 531.38
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 9
+Algorithm       : Sideways Move Hill Climbing
+Initial cost    : 531.38
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 19
+Algorithm       : Stochastic Hill Climbing
+Initial cost    : 531.38
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 9
+Algorithm       : Random-Restart Hill Climbing
+Initial cost    : 531.38
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 12
+Algorithm       : Simulated Annealing
+Initial cost    : 531.38
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 1094
+Algorithm       : Genetic Algorithm
+Initial cost    : 531.38
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 60
