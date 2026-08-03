@@ -1,4 +1,4 @@
-# Task 2 AI
+# Task 2 AI - Kurt Mikhael Purba - 13524065
 
 Repository ini berisi Proof of Concept Local Search CampusFlow dan eksperimen Decision Tree Learning, Logistic Regression, serta Support Vector Machine dari scratch.
 
