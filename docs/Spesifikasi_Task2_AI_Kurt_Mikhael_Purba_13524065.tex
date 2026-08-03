@@ -1,0 +1,921 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage[indonesian]{babel}
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{tikz}
+\graphicspath{{./}}
+\usepackage{hyperref}
+\usepackage{parskip}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=black,
+  citecolor=black
+}
+
+\titleformat{\section}
+  {\Large\bfseries}
+  {\thesection.}{0.5em}{}
+\titleformat{\subsection}
+  {\large\bfseries}
+  {\thesubsection}{0.5em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\footnotesize Spesifikasi Tugas Besar Inteligensi Artifisial - CampusFlow}
+\fancyfoot[C]{\footnotesize Halaman \thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.4em}
+\emergencystretch 1.5em
+
+\lstdefinestyle{py}{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize,
+  showstringspaces=false,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+}
+\lstdefinestyle{out}{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+}
+
+\newtcblisting{pycode}{
+  enhanced, breakable, colback=white, colframe=black,
+  boxrule=0.4pt, sharp corners, left=2mm, right=2mm, top=1mm, bottom=1mm,
+  listing only, listing options={style=py}
+}
+\newtcblisting{outcode}{
+  enhanced, breakable, colback=white, colframe=black,
+  boxrule=0.4pt, sharp corners, left=2mm, right=2mm, top=1mm, bottom=1mm,
+  listing only, listing options={style=out}
+}
+\newtcbinputlisting{\codefile}[1]{
+  enhanced, breakable, colback=white, colframe=black,
+  boxrule=0.4pt, sharp corners, left=2mm, right=2mm, top=1mm, bottom=1mm,
+  listing only, listing file={#1}, listing options={style=py}
+}
+
+\tikzset{
+  lokasi/.style={draw, circle, minimum size=0.85cm, inner sep=1.5pt, font=\scriptsize\bfseries, align=center},
+  jalur/.style={font=\scriptsize\itshape, fill=white, inner sep=1pt, midway}
+}
+
+\newcommand{\codeblock}[1]{%
+  \begin{center}
+  \fbox{%
+    \begin{minipage}{0.95\textwidth}
+      \raggedright
+      \ttfamily\small
+      #1
+    \end{minipage}
+  }
+  \end{center}
+}
+
+\begin{document}
+
+% ===================== HALAMAN JUDUL =====================
+\thispagestyle{empty}
+\begin{center}
+  \vspace*{1cm}
+  {\Large\bfseries SPESIFIKASI TUGAS BESAR}\\[0.4em]
+  {\Huge\bfseries CAMPUSFLOW}\\[0.4em]
+  \rule{0.85\textwidth}{1pt}\\[1.5em]
+  {\large Sistem Optimasi Arus Perpindahan Kelompok Mahasiswa Berbasis Simulasi dan Local Search}\\[0.6em]
+  \textbf{Mata Kuliah: Inteligensi Artifisial}\\[0.4em]
+  Repository: Task2\_AI\_13524065
+\end{center}
+
+\vspace{1em}
+\begin{center}
+  \fbox{\begin{minipage}{0.72\textwidth}
+    \centering
+    \vspace{0.5em}
+    \resizebox{0.96\linewidth}{!}{
+    \begin{tikzpicture}[scale=1]
+      \node[lokasi] (A) at (0,0) {Asrama};
+      \node[lokasi] (M) at (4.4,0) {Masjid};
+      \node[lokasi] (R) at (8.8,0) {Ruang\\Makan};
+      \node[lokasi] (K) at (0,-3) {Kelas};
+      \node[lokasi] (L) at (-3.4,-3) {Lapangan};
+      \node[lokasi] (P) at (4.4,-3) {Perpus-\\takaan};
+      \draw (A) -- node[jalur,above] {Koridor Timur} (M);
+      \draw (M) -- node[jalur,above] {Aula Timur} (R);
+      \draw (A) -- node[jalur,left] {Koridor Tengah} (K);
+      \draw (M) -- node[jalur,right] {Koridor Utara} (K);
+      \draw (L) -- node[jalur,left] {Koridor Selatan} (A);
+      \draw (L) -- node[jalur,below] {Koridor Lapangan} (K);
+      \draw (P) -- node[jalur,below] {Koridor Kampus} (K);
+      \draw (P) -- node[jalur,right] {Koridor Barat} (R);
+    \end{tikzpicture}}
+    \vspace{0.5em}
+  \end{minipage}}
+\end{center}
+
+\vspace{0.5em}
+\begin{center}
+\begin{tabularx}{0.85\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Nama} & Kurt Mikhael Purba \\
+\hline
+\textbf{NIM} & 13524065 \\
+\hline
+\end{tabularx}
+\end{center}
+
+\newpage
+
+% ===================== INFORMASI DOKUMEN =====================
+\section*{\Large\bfseries Informasi Dokumen}
+
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Elemen} & \textbf{Keterangan} \\
+\hline
+Judul sistem & CampusFlow: Optimasi Pergerakan Kelompok Mahasiswa pada Pergantian Jadwal Perkuliahan \\
+\hline
+Topik & Local Search dengan complete-state formulation \\
+\hline
+Algoritma & Basic, Sideways Move, Stochastic, dan Random-Restart Hill-Climbing, Simulated Annealing, Genetic Algorithm \\
+\hline
+Bahasa implementasi & Python 3 (tanpa pustaka eksternal) \\
+\hline
+Platform & Terminal (output berbasis teks) \\
+\hline
+Target implementasi & Spesifikasi lengkap sebagai acuan implementasi dan proof of concept fitur inti \\
+\hline
+Format repository & Task2\_AI\_13524065 \\
+\hline
+\end{tabularx}
+
+\vspace{0.8em}
+\textbf{Catatan penggunaan:} Dokumen ini dirancang sebagai acuan implementasi. Nama kelompok, kapasitas koridor, dan angka keseimbangan boleh disesuaikan selama mekanisme inti, fungsi utama, konsep wajib, serta komponen objective function tetap terpenuhi dan perubahan didokumentasikan.
+
+\section*{\Large\bfseries Daftar Isi Ringkas}
+\begin{enumerate}[leftmargin=2em,itemsep=0.2em]
+  \item Latar belakang dan tujuan tugas besar
+  \item Tujuan dan deskripsi permasalahan
+  \item Representasi state (complete-state formulation)
+  \item Data yang digunakan
+  \item Aturan serta batasan permasalahan (constraints)
+  \item Formulasi initial state
+  \item Successor function dan neighbor move
+  \item Objective function
+  \item Penerapan algoritma local search
+  \item Daftar fungsi dan command utama Python
+  \item Contoh input
+  \item Contoh output
+  \item Batas proof of concept, pengujian, dan deliverables
+  \item Penutup
+  \item Lampiran: kode sumber proof of concept
+\end{enumerate}
+
+\newpage
+
+% ===================== SECTION 1 =====================
+\section{Latar Belakang dan Tujuan Tugas Besar}
+
+\textbf{Topik.} Membangun dokumen spesifikasi dan proof of concept Tugas Besar Inteligensi Artifisial dengan topik Local Search. Sistem yang dirancang, \textbf{CampusFlow}, mengoptimalkan pergerakan kelompok mahasiswa ketika terjadi pergantian jadwal perkuliahan. Permasalahan diformulasikan sebagai persoalan local search berbasis \emph{state lengkap} (complete-state formulation): setiap state sudah memuat keputusan lengkap untuk seluruh kelompok, sehingga algoritma tidak perlu mencari path menuju goal.
+
+\textbf{Tujuan akademik.} Menggabungkan materi Local Search, mulai dari konsep state, neighbor, dan objective function, hingga Hill-Climbing, Simulated Annealing, dan Genetic Algorithm dalam satu program yang dapat dijalankan, diuji, dan dikembangkan secara modular. Implementasi wajib memperlihatkan penerapan konsep yang diminta secara nyata, bukan sekadar fungsi yang tidak berhubungan dengan permasalahan.
+
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item Memformulasikan permasalahan nyata sebagai persoalan local search dengan state lengkap.
+  \item Merancang representasi state, successor/neighbor function, dan objective function multikriteria.
+  \item Mengimplementasikan Basic (Steepest-Ascent), Sideways Move, Stochastic, dan Random-Restart Hill-Climbing, Simulated Annealing, serta Genetic Algorithm (populasi, selection, crossover, mutation).
+  \item Menyediakan proof of concept yang memvisualisasikan state awal, state akhir, dan nilai objective function selama proses pencarian.
+  \item Mendokumentasikan data, command utama, contoh input, contoh output, dan batasan implementasi.
+\end{itemize}
+
+% ===================== SECTION 2 =====================
+\section{Tujuan dan Deskripsi Permasalahan}
+
+\subsection{Deskripsi Permasalahan}
+
+Pada pergantian jadwal perkuliahan, sejumlah kelompok mahasiswa harus berpindah tempat secara bersamaan. Sebagai contoh:
+
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item Kelompok A bergerak dari Asrama menuju Masjid.
+  \item Kelompok B bergerak dari Kelas menuju Masjid.
+  \item Kelompok C bergerak dari Perpustakaan menuju Ruang Makan.
+  \item Kelompok D bergerak dari Lapangan menuju Asrama.
+\end{itemize}
+
+Ketika beberapa kelompok menggunakan koridor, tangga, atau pintu yang sama dalam waktu yang bersamaan, dapat timbul kepadatan di koridor, antrean di pintu, tabrakan arus dari arah berlawanan, keterlambatan mahasiswa, hingga risiko keamanan ketika jumlah mahasiswa melebihi kapasitas jalur.
+
+Sistem harus menentukan dua hal untuk setiap kelompok:
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.1em]
+  \item \textbf{Jalur (route)} yang digunakan; dan
+  \item \textbf{Waktu mulai bergerak (departure delay)}.
+\end{enumerate}
+
+Tujuan optimasi adalah memperoleh konfigurasi perpindahan yang menghasilkan kepadatan dan konflik arus sekecil mungkin, tanpa membuat mahasiswa terlambat mengikuti kegiatan berikutnya.
+
+\subsection{Mengapa Permasalahan Ini Berbeda}
+
+Sebagian besar tugas Local Search (N-Queens, Traveling Salesman Problem, penjadwalan mata kuliah, knapsack, pewarnaan graf, dan sejenisnya) menilai sebuah state berdasarkan susunan atau kombinasinya saja. Pada \textbf{CampusFlow}, sebuah state tidak hanya dinilai berdasarkan susunannya, tetapi harus dijalankan melalui \emph{simulasi waktu}. Nilai objective function dihasilkan oleh perilaku dinamis selama simulasi: berapa banyak mahasiswa yang berada pada satu koridor pada satu menit tertentu, apakah ada dua kelompok yang bertemu dari arah berlawanan, dan apakah kelompok tiba tepat waktu.
+
+Perubahan kecil terhadap satu kelompok pun dapat berdampak besar. Menggeser keberangkatan kelompok B satu menit dapat menghilangkan penumpukan pada tiga koridor sekaligus.
+
+% ===================== SECTION 3 =====================
+\section{Representasi State (Complete-State Formulation)}
+
+Satu state berisi keputusan lengkap untuk seluruh kelompok mahasiswa:
+
+\[
+S = [(r_1, d_1),\ (r_2, d_2),\ \ldots,\ (r_n, d_n)]
+\]
+
+Keterangan:
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item $r_i$ adalah jalur yang digunakan kelompok ke-$i$;
+  \item $d_i$ adalah waktu keberangkatan (delay) kelompok ke-$i$.
+\end{itemize}
+
+Contoh state untuk lima kelompok:
+
+\codeblock{
+[ (Kelompok A, Jalur 1, Delay 0),\\
+  (Kelompok B, Jalur 2, Delay 2),\\
+  (Kelompok C, Jalur 3, Delay 1),\\
+  (Kelompok D, Jalur 2, Delay 4),\\
+  (Kelompok E, Jalur 1, Delay 3) ]
+}
+
+State tersebut sudah merupakan solusi lengkap karena seluruh kelompok telah memiliki jalur dan waktu keberangkatan. Algoritma tidak perlu mencari path dari initial state menuju goal state; kualitas solusi cukup dinilai melalui objective function.
+
+% ===================== SECTION 4 =====================
+\section{Data yang Digunakan}
+
+\subsection{Peta Lingkungan}
+
+Lingkungan kampus dimodelkan sebagai graf: titik lokasi adalah simpul dan koridor adalah sisi. Peta yang digunakan pada proof of concept ditunjukkan pada Gambar~\ref{fig:peta}.
+
+\begin{figure}[h]
+  \centering
+  \resizebox{0.7\textwidth}{!}{
+  \begin{tikzpicture}[scale=1]
+    \node[lokasi] (A) at (0,0) {Asrama};
+    \node[lokasi] (M) at (4.4,0) {Masjid};
+    \node[lokasi] (R) at (8.8,0) {Ruang\\Makan};
+    \node[lokasi] (K) at (0,-3) {Kelas};
+    \node[lokasi] (L) at (-3.4,-3) {Lapangan};
+    \node[lokasi] (P) at (4.4,-3) {Perpus-\\takaan};
+    \draw (A) -- node[jalur,above] {Koridor Timur} (M);
+    \draw (M) -- node[jalur,above] {Aula Timur} (R);
+    \draw (A) -- node[jalur,left] {Koridor Tengah} (K);
+    \draw (M) -- node[jalur,right] {Koridor Utara} (K);
+    \draw (L) -- node[jalur,left] {Koridor Selatan} (A);
+    \draw (L) -- node[jalur,below] {Koridor Lapangan} (K);
+    \draw (P) -- node[jalur,below] {Koridor Kampus} (K);
+    \draw (P) -- node[jalur,right] {Koridor Barat} (R);
+  \end{tikzpicture}}
+  \caption{Peta kampus POC: enam titik lokasi dan delapan koridor dua arah.}
+  \label{fig:peta}
+\end{figure}
+
+\subsection{Data Kelompok}
+
+Setiap kelompok memiliki nama, jumlah mahasiswa, titik asal, titik tujuan, batas waktu tiba, daftar jalur alternatif, dan kecepatan bergerak. Dalam POC, kecepatan seluruh kelompok adalah 1 (waktu tempuh hanya ditentukan koridor).
+
+\begin{pycode}
+{
+    "nama": "Kelompok A",
+    "jumlah": 30,
+    "asal": "Asrama",
+    "tujuan": "Masjid",
+    "deadline": 8,
+    "alternatif": [["E1"], ["E5", "E2"]]
+}
+\end{pycode}
+
+\subsection{Data Jalur}
+
+Setiap koridor memiliki nama, kapasitas maksimal, waktu tempuh, dan status dua arah. Pada POC seluruh koridor bersifat dua arah.
+
+\begin{pycode}
+{
+    "nama": "Koridor Timur",
+    "kapasitas": 40,
+    "waktu": 2,
+    "dua_arah": True
+}
+\end{pycode}
+
+% ===================== SECTION 5 =====================
+\section{Aturan serta Batasan Permasalahan (Constraints)}
+
+\subsection{Constraints}
+
+Sebagian constraints bersifat wajib (item 1--7): state yang melanggarnya dinyatakan tidak valid dan tidak pernah diproses lebih lanjut. Sebagian lainnya bersifat prioritas (item 8--13): boleh dilanggar, tetapi setiap pelanggaran menambah nilai cost.
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.1em]
+  \item Setiap kelompok harus memiliki tepat satu jalur.
+  \item Jalur harus menghubungkan titik asal dan tujuan kelompok.
+  \item Jalur yang sedang ditutup tidak boleh digunakan.
+  \item Delay harus berada dalam rentang yang diizinkan ($0 \le d_i \le \text{MAX\_DELAY}$).
+  \item Setiap kelompok harus tiba sebelum batas keterlambatan maksimal (deadline + toleransi).
+  \item Kelompok dengan kebutuhan khusus hanya boleh menggunakan jalur aksesibel.
+  \item Kelompok tidak boleh berpindah melalui ruangan yang dilarang.
+  \item Jumlah mahasiswa dalam suatu koridor sebaiknya tidak melebihi kapasitas.
+  \item Dua kelompok sebaiknya tidak bertemu dari arah berlawanan.
+  \item Waktu tunggu kelompok sebaiknya sekecil mungkin.
+  \item Perbedaan delay antarkelompok sebaiknya tetap adil.
+  \item Jalur memutar sebaiknya tidak terlalu sering digunakan.
+  \item Penumpukan di pintu masuk masjid atau ruang makan harus diminimalkan.
+\end{enumerate}
+
+% ===================== SECTION 6 =====================
+\section{Formulasi Initial State}
+
+Initial state dibuat secara acak. Untuk setiap kelompok, program:
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.1em]
+  \item Memilih salah satu jalur yang valid secara acak;
+  \item Memberikan delay secara acak dalam rentang yang diizinkan;
+  \item Memeriksa seluruh constraints;
+  \item Mengulang pengacakan apabila state tidak valid.
+\end{enumerate}
+
+Pembangkitan initial state ditangani oleh fungsi \texttt{generate\_initial\_state()}. State random pertama biasanya belum efisien karena beberapa kelompok dapat menumpuk pada jalur yang sama. Contoh initial state dari POC (seed tetap 42 agar reprodusibel):
+
+\begin{outcode}
+=== INITIAL STATE (random) ===
+Kelompok A  : Koridor Timur (delay 0)
+Kelompok B  : Koridor Tengah -> Koridor Timur (delay 1)
+Kelompok C  : Koridor Barat (delay 1)
+Kelompok D  : Koridor Selatan (delay 5)
+
+Capacity penalty : 50
+Conflict penalty : 0
+Lateness penalty : 0
+Waiting penalty  : 7
+Distance penalty : 10
+Fairness penalty : 3.69
+Total objective cost: 531.38
+\end{outcode}
+
+% ===================== SECTION 7 =====================
+\section{Successor Function dan Neighbor Move}
+
+Neighbor diperoleh dengan melakukan perubahan kecil terhadap state saat ini. POC menyediakan empat move dasar dan satu move perturbasi.
+
+\subsection{Move 1: Mengubah Delay Satu Kelompok}
+
+Delay dinaikkan atau diturunkan satu satuan waktu:
+
+\[
+d_i' = d_i \pm 1
+\]
+
+\codeblock{
+Sebelum : Kelompok B -> Koridor Utara, delay 1\\
+Sesudah : Kelompok B -> Koridor Utara, delay 2
+}
+
+\subsection{Move 2: Mengubah Jalur Satu Kelompok}
+
+Jalur diganti dengan salah satu jalur alternatif yang masih valid.
+
+\codeblock{
+Sebelum : Kelompok C -> Koridor Barat, delay 2\\
+Sesudah : Kelompok C -> Koridor Kampus, delay 2
+}
+
+\subsection{Move 3: Menukar Jalur Dua Kelompok}
+
+\codeblock{
+Kelompok A: Koridor Timur \hspace*{2em} menjadi \hspace*{2em} Kelompok A: Koridor Utara\\
+Kelompok B: Koridor Utara \hspace*{2em} menjadi \hspace*{2em} Kelompok B: Koridor Timur
+}
+
+Move ini hanya diterima bila kedua kelompok tetap memenuhi constraints.
+
+\subsection{Move 4: Menukar Delay Dua Kelompok}
+
+Move ini berguna ketika salah satu kelompok lebih besar atau memiliki deadline yang lebih ketat.
+
+\subsection{Move 5: Group Perturbation}
+
+Beberapa kelompok yang memiliki titik tujuan yang sama diubah secara bersamaan. Move ini digunakan pada Simulated Annealing dan mutation pada Genetic Algorithm.
+
+Seluruh neighbor dari \texttt{generate\_neighbors(state)} dan \texttt{random\_neighbor(state)} sudah lolos pemeriksaan \texttt{is\_valid\_state()}.
+
+% ===================== SECTION 8 =====================
+\section{Objective Function}
+
+Permasalahan dirancang sebagai \emph{minimization problem}. Semakin kecil nilai cost, semakin baik solusi.
+
+\[
+Cost(S) = w_1 C_{\mathrm{capacity}} + w_2 C_{\mathrm{conflict}} + w_3 C_{\mathrm{late}} + w_4 C_{\mathrm{waiting}} + w_5 C_{\mathrm{distance}} + w_6 C_{\mathrm{fairness}}
+\]
+
+Bobot yang digunakan pada POC:
+
+\[
+Cost(S) = 10\,C_{\mathrm{capacity}} + 8\,C_{\mathrm{conflict}} + 15\,C_{\mathrm{late}} + 2\,C_{\mathrm{waiting}} + C_{\mathrm{distance}} + 2\,C_{\mathrm{fairness}}
+\]
+
+Keterlambatan diberi bobot paling besar karena dapat mengganggu jadwal kegiatan. Kelebihan kapasitas dan konflik arah juga diberi bobot tinggi karena berkaitan dengan keamanan.
+
+\subsection{Penalti Kelebihan Kapasitas}
+
+Untuk setiap ruas dan setiap waktu:
+
+\[
+OverCapacity(e, t) = \max(0,\ Occupancy(e, t) - Capacity(e))
+\]
+
+Total penalti kapasitas:
+
+\[
+C_{\mathrm{capacity}} = \sum_t \sum_e OverCapacity(e, t)^2
+\]
+
+Nilai dikuadratkan agar kelebihan kapasitas yang besar mendapat hukuman lebih berat. Contoh: koridor berkapasitas 40 diisi 55 mahasiswa menghasilkan penalti $(55-40)^2 = 225$.
+
+\subsection{Penalti Konflik Arah}
+
+Konflik terjadi apabila dua kelompok berada pada ruas yang sama dalam waktu yang sama, tetapi bergerak dari arah berlawanan:
+
+\[
+C_{\mathrm{conflict}} = \sum_{t, e} Forward(e, t) \times Backward(e, t)
+\]
+
+Semakin banyak pasangan kelompok yang bertemu dari arah berlawanan, semakin tinggi penaltinya.
+
+\subsection{Penalti Keterlambatan}
+
+\[
+C_{\mathrm{late}} = \sum_i Size_i \times \max(0,\ Arrival_i - Deadline_i)
+\]
+
+Keterlambatan dikalikan jumlah mahasiswa agar kelompok besar (misalnya 40 mahasiswa) lebih diperhatikan dibandingkan kelompok kecil (misalnya 5 mahasiswa).
+
+\subsection{Penalti Waktu Tunggu}
+
+\[
+C_{\mathrm{waiting}} = \sum_i d_i
+\]
+
+Komponen ini mendorong sistem meminimalkan total delay seluruh kelompok.
+
+\subsection{Penalti Jarak}
+
+\[
+C_{\mathrm{distance}} = \sum_i TravelTime(route_i)
+\]
+
+Komponen ini menghindari penggunaan jalur memutar yang terlalu panjang.
+
+\subsection{Penalti Keadilan}
+
+Tanpa komponen ini, algoritma mungkin terus memberikan delay besar kepada kelompok tertentu. Keadilan dihitung menggunakan varians delay:
+
+\[
+C_{\mathrm{fairness}} = \frac{1}{n} \sum_i \left(d_i - \bar{d}\right)^2
+\]
+
+Objective ini mendorong sistem menghasilkan pembagian waktu tunggu yang lebih proporsional.
+
+% ===================== SECTION 9 =====================
+\section{Penerapan Algoritma Local Search}
+
+\subsection{Empat Varian Hill-Climbing}
+
+POC mengimplementasikan empat varian Hill-Climbing dalam bentuk minimisasi:
+
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item \textbf{Basic (Steepest-Ascent):} mengevaluasi seluruh neighbor dan memilih cost terendah yang lebih baik.
+  \item \textbf{Sideways Move:} menerima neighbor dengan cost sama secara terbatas untuk melewati plateau.
+  \item \textbf{Stochastic:} memilih secara acak dari kumpulan neighbor yang memperbaiki cost.
+  \item \textbf{Random Restart:} menjalankan Basic dari beberapa initial state acak dan mengambil solusi terbaik.
+\end{itemize}
+
+Tahapan Basic pada setiap pencarian adalah:
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.1em]
+  \item Membuat initial state random.
+  \item Menghasilkan seluruh neighbor melalui \texttt{generate\_neighbors(state)}.
+  \item Menghitung cost setiap neighbor.
+  \item Memilih neighbor dengan cost paling kecil.
+  \item Berpindah apabila neighbor lebih baik dari state saat ini.
+  \item Berhenti ketika tidak ada neighbor yang lebih baik.
+\end{enumerate}
+
+Sideways Move menggunakan batas jumlah perpindahan dengan cost sama, sedangkan Stochastic memperkenalkan variasi urutan pencarian. Random Restart dijalankan enam kali karena persoalan simulasi arus memiliki banyak local optimum.
+
+Setiap varian menyimpan urutan state dan objective function. POC menampilkan perubahan cost sebagai grafik batang teks dan mencatat kelompok yang berubah pada setiap iterasi.
+
+\subsection{Simulated Annealing}
+
+Simulated Annealing dapat menerima solusi yang lebih buruk dengan probabilitas tertentu agar dapat keluar dari local optimum:
+
+\[
+P = e^{-\frac{\Delta E}{T}}
+\]
+
+dengan $\Delta E$ adalah peningkatan cost dan $T$ adalah temperature. Tahapan:
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.1em]
+  \item Membuat initial state.
+  \item Mengambil satu random neighbor.
+  \item Jika neighbor lebih baik, neighbor diterima.
+  \item Jika lebih buruk, neighbor diterima dengan probabilitas $e^{-\Delta E / T}$.
+  \item Temperature diturunkan secara geometrik ($T \leftarrow \alpha T$, $\alpha = 0{,}995$).
+  \item Proses berhenti ketika temperature minimum tercapai.
+\end{enumerate}
+
+Pada awal proses, temperature tinggi sehingga penerimaan state yang lebih buruk masih diizinkan; semakin dingin, perilaku semakin menyerupai hill-climbing.
+
+\subsection{Genetic Algorithm}
+
+\subsubsection{Representasi Chromosome}
+
+Satu chromosome merepresentasikan seluruh kelompok, sama seperti representasi state:
+
+\codeblock{
+[ (route\_A, delay\_A), (route\_B, delay\_B),\\
+  (route\_C, delay\_C), (route\_D, delay\_D) ]
+}
+
+\subsubsection{Population, Fitness, dan Elitism}
+
+Population berisi sejumlah state random (ukuran 40 pada POC). Karena persoalan menggunakan cost minimization:
+
+\[
+Fitness(S) = \frac{1}{1 + Cost(S)}
+\]
+
+Beberapa chromosome terbaik (elite) dipertahankan langsung ke generasi berikutnya agar solusi terbaik tidak hilang.
+
+\subsubsection{Selection}
+
+Metode yang digunakan adalah \textbf{Tournament Selection} (ukuran turnamen 3): dipilih chromosome dengan fitness tertinggi dari beberapa kandidat acak. Tournament Selection dipilih karena lebih sederhana untuk proof of concept.
+
+\subsubsection{Crossover}
+
+\textbf{One-point crossover} memotong dua parent pada titik acak lalu menukar segmennya:
+
+\codeblock{
+Parent 1 : [A1, B1, C1 | D1, E1]\\
+Parent 2 : [A2, B2, C2 | D2, E2]\\[0.6em]
+Child 1  : [A1, B1, C1 | D2, E2]\\
+Child 2  : [A2, B2, C2 | D1, E1]
+}
+
+Anak yang tidak lolos constraints diganti dengan parent-nya.
+
+\subsubsection{Mutation}
+
+Mutation berupa salah satu neighbor move: mengganti jalur satu kelompok, menambah atau mengurangi delay, atau menukar delay dua kelompok. POC menggunakan probabilitas mutasi sebesar $0{,}4$.
+
+% ===================== SECTION 10 =====================
+\section{Daftar Fungsi dan Command Utama Python}
+
+Implementasi dibagi menjadi beberapa modul pada folder \texttt{src/local\_search/} agar mudah dikembangkan dan diuji. Struktur modul:
+
+\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{File} & \textbf{Isi} \\
+\hline
+\texttt{src/local\_search/data.py} & Definisi data: koridor (\texttt{EDGES}), kelompok (\texttt{GROUPS}), konstanta (\texttt{MAX\_DELAY}, \texttt{HARD\_TOLERANCE}, \texttt{WEIGHTS}). \\
+\hline
+\texttt{src/local\_search/simulation.py} & \texttt{simulate\_flow()}, \texttt{route\_time()}, \texttt{arrival\_time()}. \\
+\hline
+\texttt{src/local\_search/objective.py} & Keenam fungsi penalti dan \texttt{objective\_function()}. \\
+\hline
+\texttt{src/local\_search/state.py} & \texttt{is\_valid\_state()}, \texttt{generate\_initial\_state()}, \texttt{generate\_neighbors()}, \texttt{random\_neighbor()}. \\
+\hline
+\texttt{src/local\_search/algorithms.py} & Hill-Climbing, Simulated Annealing, dan seluruh komponen Genetic Algorithm. \\
+\hline
+\texttt{src/local\_search/view.py} & Seluruh fungsi pencetakan dan visualisasi teks. \\
+\hline
+\texttt{src/local\_search/main.py} & Titik masuk yang menjalankan ketiga algoritma. \\
+\hline
+\end{tabularx}
+
+Fungsi-fungsi berikut diimplementasikan pada modul \texttt{src/} dan dijalankan dari direktori repositori:
+
+\begin{pycode}
+python src/local_search/main.py
+\end{pycode}
+
+{\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{6.5cm}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Fungsi} & \textbf{Kegunaan} \\
+\hline
+\texttt{generate\_initial\_state()} & Membuat initial state acak yang memenuhi seluruh constraints. \\
+\hline
+\texttt{is\_valid\_state(state)} & Memeriksa seluruh constraints untuk satu state. \\
+\hline
+\texttt{simulate\_flow(state)} & Menjalankan simulasi pergerakan seluruh kelompok dan mengembalikan okupansi serta arah per koridor per menit. \\
+\hline
+\texttt{calculate\_capacity\_penalty(sim)} & Menghitung penalti kelebihan kapasitas koridor. \\
+\hline
+\texttt{calculate\_conflict\_penalty(sim)} & Menghitung penalti konflik arah (forward $\times$ backward). \\
+\hline
+\texttt{calculate\_lateness\_penalty(state)} & Menghitung keterlambatan tiap kelompok dikali jumlah mahasiswa. \\
+\hline
+\texttt{calculate\_waiting\_penalty(state)} & Menghitung total delay seluruh kelompok. \\
+\hline
+\texttt{calculate\_distance\_penalty(state)} & Menghitung total waktu tempuh jalur yang digunakan. \\
+\hline
+\texttt{calculate\_fairness\_penalty(state)} & Menghitung varians delay antarkelompok. \\
+\hline
+\texttt{objective\_function(state)} & Menghitung total cost (bobot tetap yang dikonfigurasi global). \\
+\hline
+\texttt{generate\_neighbors(state)} & Menghasilkan seluruh neighbor valid (Move 1--4). \\
+\hline
+\texttt{random\_neighbor(state)} & Mengambil satu neighbor acak (untuk Simulated Annealing dan mutation). \\
+\hline
+\texttt{hill\_climbing\_basic(initial)} & Menjalankan Basic Steepest-Ascent Hill-Climbing. \\
+\hline
+\texttt{hill\_climbing\_sideways(initial)} & Menjalankan Sideways Move dengan batas plateau. \\
+\hline
+\texttt{hill\_climbing\_stochastic(initial)} & Memilih neighbor yang membaik secara stokastik. \\
+\hline
+\texttt{random\_restart\_hill\_climbing(restarts)} & Menjalankan Basic dari beberapa initial state. \\
+\hline
+\texttt{simulated\_annealing(initial, t0, alpha, min\_temp)} & Menjalankan Simulated Annealing dengan pendinginan geometrik. \\
+\hline
+\texttt{initialize\_population(size)} & Membuat populasi awal Genetic Algorithm. \\
+\hline
+\texttt{fitness(chromosome)} & Mengubah cost menjadi fitness $1/(1+Cost)$. \\
+\hline
+\texttt{tournament\_selection(population, k)} & Memilih parent dengan Tournament Selection. \\
+\hline
+\texttt{crossover(parent\_1, parent\_2)} & One-point crossover dengan perbaikan constraints. \\
+\hline
+\texttt{mutate(chromosome)} & Menerapkan satu neighbor move secara acak. \\
+\hline
+\texttt{genetic\_algorithm(\allowbreak population\_size,\allowbreak generations,\allowbreak mutation\_rate,\allowbreak elite\_size)} & Menjalankan proses evolusi dengan elitism. \\
+\hline
+\texttt{print\_state(state)} & Menampilkan konfigurasi jalur dan delay seluruh kelompok. \\
+\hline
+\texttt{print\_penalties(state)} & Menampilkan rincian keenam komponen penalty dan total cost. \\
+\hline
+\texttt{print\_simulation(state)} & Menampilkan kondisi tiap koridor untuk setiap menit. \\
+\hline
+\texttt{print\_summary(name,\allowbreak initial\_cost,\allowbreak final\_cost,\allowbreak iterations)} & Menampilkan ringkasan perbandingan hasil algoritma. \\
+\hline
+\end{tabularx}}
+
+% ===================== SECTION 11 =====================
+\section{Contoh Input}
+
+Input POC didefinisikan pada data \texttt{GROUPS} dan \texttt{EDGES} di \texttt{src/local\_search/data.py}:
+
+\begin{outcode}
+Jumlah kelompok: 4
+
+Kelompok A  : 30 mahasiswa, Asrama -> Masjid,       deadline menit ke-8
+              alternatif: [Koridor Timur], [Koridor Tengah -> Koridor Utara]
+Kelompok B  : 25 mahasiswa, Kelas -> Masjid,        deadline menit ke-7
+              alternatif: [Koridor Utara], [Koridor Tengah -> Koridor Timur]
+Kelompok C  : 20 mahasiswa, Perpustakaan -> Ruang Makan, deadline menit ke-9
+              alternatif: [Koridor Barat], [Koridor Kampus -> Koridor Utara -> Aula Timur]
+Kelompok D  : 35 mahasiswa, Lapangan -> Asrama,     deadline menit ke-10
+              alternatif: [Koridor Selatan], [Koridor Lapangan -> Koridor Tengah]
+
+Koridor (kapasitas, waktu tempuh):
+Koridor Timur 40/2   Koridor Utara 30/2   Koridor Barat 25/2   Koridor Selatan 35/2
+Koridor Tengah 20/2  Aula Timur 30/1      Koridor Kampus 20/3  Koridor Lapangan 25/2
+
+Konstanta: MAX_DELAY = 6, HARD_TOLERANCE = 6, seed random = 42
+\end{outcode}
+
+% ===================== SECTION 12 =====================
+\section{Contoh Output}
+
+Seluruh output berikut adalah hasil nyata dari POC.
+
+\subsection{Initial State dan Proses Pencarian (Hill-Climbing)}
+
+\begin{outcode}
+=== INITIAL STATE (random) ===
+Kelompok A  : Koridor Timur (delay 0)
+Kelompok B  : Koridor Tengah -> Koridor Timur (delay 1)
+Kelompok C  : Koridor Barat (delay 1)
+Kelompok D  : Koridor Selatan (delay 5)
+
+Capacity penalty : 50
+Conflict penalty : 0
+Lateness penalty : 0
+Waiting penalty  : 7
+Distance penalty : 10
+Fairness penalty : 3.69
+Total objective cost: 531.38
+
+Restart 1: 525.38 -> 23.38 -> 19.00 -> 15.38 -> 12.50 -> 10.38 -> 8.00
+Restart 2: 8796.50 -> 2294.50 -> 40.50 -> 37.38 -> 35.00 -> 32.38 -> 29.50
+           -> 27.38 -> 25.00 -> 22.38 -> 20.50 -> 18.38 -> 16.00 -> 14.38
+           -> 12.50 -> 10.38 -> 8.00
+...
+Best cost setelah 6 restart : 8.00
+\end{outcode}
+
+\subsection{Proses Pencarian (Simulated Annealing)}
+
+\begin{outcode}
+Iterasi 0..9      : 537.00 35.00 35.00 39.00 40.38 36.38 36.38 36.38 36.38 36.00
+Tengah simulasi   : 21.38 25.38 25.38 25.38 25.38
+Akhir simulasi    : 8.00 8.00 8.00 8.00 8.00
+Total iterasi     : 1094
+\end{outcode}
+
+\subsection{Proses Pencarian (Genetic Algorithm)}
+
+\begin{outcode}
+Best fitness per generasi (setiap 10):
+Generasi 0    : 36.50
+Generasi 10   : 8.00
+Generasi 20   : 8.00
+Generasi 30   : 8.00
+Generasi 40   : 8.00
+Generasi 50   : 8.00
+Generasi 59   : 8.00
+\end{outcode}
+
+\subsection{Final State}
+
+\begin{outcode}
+=== FINAL STATE (solusi terbaik) ===
+Kelompok A  : Koridor Timur (delay 0)
+Kelompok B  : Koridor Utara (delay 0)
+Kelompok C  : Koridor Barat (delay 0)
+Kelompok D  : Koridor Selatan (delay 0)
+
+Capacity penalty : 0
+Conflict penalty : 0
+Lateness penalty : 0
+Waiting penalty  : 0
+Distance penalty : 8
+Fairness penalty : 0.00
+Total objective cost: 8.00
+\end{outcode}
+
+Semua kelompok berangkat tanpa delay pada jalur langsung; tidak ada koridor yang kelebihan kapasitas, tidak ada konflik arah, dan tidak ada keterlambatan. Cost akhir hanya berasal dari penalti jarak $8 = 2+2+2+2$.
+
+\subsection{Visualisasi Teks Simulasi}
+
+Perbandingan kondisi koridor pada menit yang sama, antara initial state dan final state:
+
+\begin{outcode}
+INITIAL STATE, MENIT 1:
+Koridor Timur  : [########..] 30/40
+Koridor Barat  : [########..] 20/25
+Koridor Tengah : [##########] 25/20   <-- melebihi kapasitas 20
+
+FINAL STATE, MENIT 1:
+Koridor Timur  : [########..] 30/40
+Koridor Utara  : [########..] 25/30
+Koridor Barat  : [########..] 20/25
+Koridor Selatan : [##########] 35/35
+\end{outcode}
+
+Pada initial state, Koridor Tengah menampung 25 mahasiswa padahal kapasitasnya 20 (penalti $2 \times 5^2 = 50$). Pada final state, seluruh kelompok berpindah serentak pada jalur langsung sehingga tidak ada koridor yang melebihi kapasitas dan seluruh kelompok tiba tepat waktu.
+
+\subsection{Ringkasan Hasil}
+
+\begin{outcode}
+=== RINGKASAN HASIL ===
+Initial cost    : 531.38
+
+Algorithm       : Random-Restart Hill Climbing
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 7
+
+Algorithm       : Simulated Annealing
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 1094
+
+Algorithm       : Genetic Algorithm
+Final cost      : 8.00
+Improvement     : 98.49%
+Total iteration : 60
+\end{outcode}
+
+Ketiga algoritma berhasil mencapai solusi optimal yang sama (cost $8{,}00$) pada konfigurasi POC ini, dengan jumlah iterasi yang sangat berbeda. Hill-Climbing merupakan algoritma tercepat (7 langkah), diikuti Genetic Algorithm (60 generasi) dan Simulated Annealing (1094 iterasi).
+
+% ===================== SECTION 13 =====================
+\section{Batas Proof of Concept, Pengujian, dan Deliverables}
+
+\subsection{Batas Proof of Concept}
+
+Proof of concept yang disertakan pada repository mengimplementasikan fitur utama dan bonus Local Search, serta menjadi bukti bahwa rancangan dapat dijalankan. POC bukan implementasi akhir seluruh fitur bonus lainnya.
+
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.4cm}|c|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Fitur} & \textbf{Status POC} & \textbf{Kriteria Selesai} \\
+\hline
+Initial state acak valid & Sudah & \texttt{generate\_initial\_state()} selalu menghasilkan state yang lolos constraints. \\
+\hline
+Simulasi arus per menit & Sudah & \texttt{simulate\_flow()} menghitung okupansi dan arah tiap koridor per menit. \\
+\hline
+Objective function enam komponen & Sudah & Seluruh penalti terhitung dan terperinci pada output. \\
+\hline
+Hill-Climbing & Sudah & Basic, Sideways Move, Stochastic, Random Restart, dan pencatatan history. \\
+\hline
+Simulated Annealing & Sudah & Penerimaan state lebih buruk berbasis probabilitas. \\
+\hline
+Genetic Algorithm & Sudah & Populasi, tournament selection, one-point crossover, mutation, dan elitism. \\
+\hline
+Visualisasi teks & Sudah & State awal, state akhir, history cost, perubahan state per iterasi, dan simulasi per menit ditampilkan. \\
+\hline
+Perbandingan kuantitatif & Sudah & Ringkasan cost awal, cost akhir, improvement, dan jumlah iterasi. \\
+\hline
+Peta kompleks (banyak lokasi) & Belum & Dapat ditambahkan pada implementasi akhir. \\
+\hline
+Koridor ditutup dinamis & Belum & constraint jalur tertutup baru diaktifkan sebagian. \\
+\hline
+Antarmuka grafis & Belum & Implementasi akhir tetap berbasis terminal. \\
+\hline
+\end{tabularx}
+
+\subsection{Pengujian}
+
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item Random generator menggunakan \texttt{random.seed(42)} sehingga seluruh hasil dapat direproduksi.
+  \item Setiap state dan neighbor diperiksa dengan \texttt{is\_valid\_state()} sebelum diproses.
+  \item Hasil tiga algoritma dibandingkan terhadap cost akhir yang sama (optimal) untuk memverifikasi konsistensi objective function.
+\end{itemize}
+
+\subsection{Deliverables}
+
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item Dokumen spesifikasi ini (sumber \texttt{.tex} dan hasil \texttt{.pdf}).
+  \item \texttt{src/local\_search/main.py} dan modul pendukung \texttt{src/}: proof of concept Python.
+  \item \texttt{src/local\_search/poc\_output.txt}: output lengkap hasil menjalankan POC.
+\end{itemize}
+
+% ===================== SECTION 14 =====================
+\section{Penutup}
+
+CampusFlow merupakan persoalan local search yang lengkap: complete-state formulation yang jelas, neighbor function berbasis empat move sederhana, objective function multikriteria enam komponen, serta peran yang relevan untuk Random-Restart Hill-Climbing, Simulated Annealing, dan Genetic Algorithm. Proof of concept membuktikan ketiga algoritma berhasil menurunkan cost dari 531{,}38 menjadi 8{,}00 (perbaikan 98{,}49\%) pada konfigurasi uji. Rancangan ini dapat dikembangkan lebih lanjut menjadi simulasi keamanan, evakuasi, atau manajemen fasilitas kampus tanpa mengubah kontrak fungsi utama.
+
+\newpage
+
+% ===================== LAMPIRAN =====================
+\appendix
+\section{Lampiran: Kode Sumber Proof of Concept}
+
+Kode sumber lengkap POC dibagi menjadi tujuh modul pada folder \texttt{src/local\_search/}. Untuk menjalankan seluruh simulasi: \texttt{python src/local\_search/main.py}. Berikut isi setiap modul.
+
+\subsection{\texttt{src/local\_search/data.py}: Data Lingkungan}
+
+\codefile{../src/local_search/data.py}
+
+\subsection{\texttt{src/local\_search/simulation.py}: Simulasi Arus}
+
+\codefile{../src/local_search/simulation.py}
+
+\subsection{\texttt{src/local\_search/objective.py}: Objective Function}
+
+\codefile{../src/local_search/objective.py}
+
+\subsection{\texttt{src/local\_search/state.py}: State, Initial State, dan Neighbor}
+
+\codefile{../src/local_search/state.py}
+
+\subsection{\texttt{src/local\_search/algorithms.py}: Algoritma Local Search}
+
+\codefile{../src/local_search/algorithms.py}
+
+\subsection{\texttt{src/local\_search/view.py}: Visualisasi Teks}
+
+\codefile{../src/local_search/view.py}
+
+\subsection{\texttt{src/local\_search/main.py}: Titik Masuk Program}
+
+\codefile{../src/local_search/main.py}
+
+\end{document}
+
