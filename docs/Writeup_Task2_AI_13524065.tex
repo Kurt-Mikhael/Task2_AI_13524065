@@ -46,7 +46,7 @@
 
 \section{TLDR}
 
-Tugas ini meminta saya mengimplementasikan Decision Tree Learning, Logistic Regression, dan SVM dari nol dengan NumPy untuk kompetisi klasifikasi tabular di Kaggle, lalu membandingkannya dengan versi scikit-learn dan melakukan submisi. Targetnya memprediksi \texttt{loan\_status} dengan metrik macro F1. Prosesnya berjalan tiga tahap notebook yang saya petakan ke v1, v2, dan v3. Tahap pertama (v1) membangun pipeline robust dengan repeated stratified 5-fold cross-validation, tuning threshold exact untuk macro F1, dan feature expansion tanpa bocor ke test. Tahap kedua (v2) menambahkan CART cost-sensitive dengan bobot kelas positif di dalam Gini impurity. Tahap ketiga (v3) menguji eksperimen terkontrol memasukkan \texttt{person\_id} sebagai fitur setelah audit train-only menunjukkan struktur source-order yang kuat. Submisi terbaik saya mencapai skor publik 0.88735 dengan satu CART dari scratch, diikuti 0.86571 (weighted CART), 0.85409 (CART robust), dan 0.84573 (baseline pertama).
+ Tugas ini meminta saya mengimplementasikan Decision Tree Learning, Logistic Regression, dan SVM dari nol dengan NumPy untuk kompetisi klasifikasi tabular di Kaggle, lalu membandingkannya dengan versi scikit-learn dan melakukan submisi. Targetnya memprediksi \texttt{loan\_status} dengan metrik macro F1. Prosesnya berjalan empat tahap notebook yang saya petakan ke v1 sampai v4. Tahap pertama (v1) membangun pipeline robust dengan repeated stratified 5-fold cross-validation, tuning threshold exact untuk macro F1, dan feature expansion tanpa bocor ke test. Tahap kedua (v2) menambahkan CART cost-sensitive dengan bobot kelas positif di dalam Gini impurity. Tahap ketiga (v3) menguji eksperimen terkontrol memasukkan \texttt{person\_id} sebagai fitur setelah audit train-only menunjukkan struktur source-order yang kuat. Tahap keempat (v4) memperluas pencarian CART ID-aware ke leaf yang lebih kecil dan memilih model berdasarkan stabilitas Macro-F1 serta threshold pada repeated OOF. Submisi publik terbaik yang tercatat mencapai skor 0.88735 dengan satu CART dari scratch, diikuti 0.86571 (weighted CART), 0.85409 (CART robust), dan 0.84573 (baseline pertama).
 
 \section{Problem Overview}
 
@@ -99,7 +99,7 @@ Strategi validasi naik bertahap. Baseline awal memakai stratified holdout 80/20 
 
 Macro F1 sensitif terhadap threshold. Threshold default 0.5 untuk LR dan 0.0 untuk SVM tidak selalu optimal, apalagi dengan kelas tidak seimbang. Saya menulis fungsi exact threshold optimization yang menyortir skor OOF lalu menghitung macro F1 kumulatif dalam $O(n\log n)$, dan memilih threshold yang memaksimalkan macro F1. Dua atau tiga kandidat konfigurasi terbaik dari tuning seed tunggal lalu diuji ulang pada tiga seed CV (42, 2026, 777), dan pemenangnya dipilih dari rata rata repeated OOF macro F1 dengan threshold diambil dari median antar repeat.
 
-Hasil lokal dan leaderboard publik cukup konsisten. Pada validasi OOF, varian ID-aware CART keluar sebagai yang terbaik, dan memang submisi \texttt{submission\_best\_scratch\_v2\_plus.csv} mendapat skor publik tertinggi. Perbandingan skor publik seluruh submisi saya ada di Tabel~\ref{tab:lb}.
+Hasil lokal dan leaderboard publik cukup konsisten. Pada validasi OOF, varian ID-aware CART keluar sebagai yang terbaik. V4 membekukan varian tersebut melalui repeated OOF dan menghasilkan \texttt{submission\_best\_scratch\_v4\_90plus.csv}; skor publik v4 belum saya klaim karena belum tersedia pada catatan eksperimen. Perbandingan skor publik yang sudah tercatat ada di Tabel~\ref{tab:lb}.
 
 \begin{table}[h]
 \centering
@@ -109,6 +109,7 @@ Hasil lokal dan leaderboard publik cukup konsisten. Pada validasi OOF, varian ID
 \textbf{Submisi} & \textbf{Model} & \textbf{Skor Publik} \\
 \midrule
 submission\_best\_scratch\_v2\_plus.csv & CART scratch dengan person\_id & 0.88735 \\
+submission\_best\_scratch\_v4\_90plus.csv & CART scratch ID-aware, threshold-stable & belum tercatat \\
 submission\_best\_scratch\_weighted\_cart\_v2.csv & Weighted CART scratch & 0.86571 \\
 submission\_best\_scratch\_robust.csv & CART scratch robust no leakage & 0.85409 \\
 submission\_cart\_scratch.csv & CART scratch baseline & 0.84573 \\
