@@ -46,13 +46,29 @@
 
 \section{TLDR}
 
- Tugas ini meminta saya mengimplementasikan Decision Tree Learning, Logistic Regression, dan SVM dari nol dengan NumPy untuk kompetisi klasifikasi tabular di Kaggle, lalu membandingkannya dengan versi scikit-learn dan melakukan submisi. Targetnya memprediksi \texttt{loan\_status} dengan metrik macro F1. Prosesnya berjalan empat tahap notebook yang saya petakan ke v1 sampai v4. Tahap pertama (v1) membangun pipeline robust dengan repeated stratified 5-fold cross-validation, tuning threshold exact untuk macro F1, dan feature expansion tanpa bocor ke test. Tahap kedua (v2) menambahkan CART cost-sensitive dengan bobot kelas positif di dalam Gini impurity. Tahap ketiga (v3) menguji eksperimen terkontrol memasukkan \texttt{person\_id} sebagai fitur setelah audit train-only menunjukkan struktur source-order yang kuat. Tahap keempat (v4) memperluas pencarian CART ID-aware ke leaf yang lebih kecil dan memilih model berdasarkan stabilitas Macro-F1 serta threshold pada repeated OOF. Submisi publik terbaik yang tercatat mencapai skor 0.88735 dengan satu CART dari scratch, diikuti 0.86571 (weighted CART), 0.85409 (CART robust), dan 0.84573 (baseline pertama).
+ Write-up ini mendokumentasikan proses implementasi Decision Tree Learning, Logistic Regression, dan SVM dari nol dengan NumPy untuk kompetisi klasifikasi tabular di Kaggle. Ketiga model dibandingkan dengan implementasi scikit-learn dan digunakan untuk menghasilkan beberapa submisi. Target yang diprediksi adalah \texttt{loan\_status} dengan metrik macro F1. Proses eksperimen berlangsung dalam empat tahap notebook, yaitu v1 sampai v4. Tahap pertama (v1) membangun pipeline robust dengan repeated stratified 5-fold cross-validation, tuning threshold exact untuk macro F1, dan feature expansion tanpa bocor ke test. Tahap kedua (v2) menambahkan CART cost-sensitive dengan bobot kelas positif di dalam Gini impurity. Tahap ketiga (v3) menguji eksperimen terkontrol dengan memasukkan \texttt{person\_id} sebagai fitur setelah audit train-only menunjukkan struktur source-order yang kuat. Tahap keempat (v4) memperluas pencarian CART ID-aware ke leaf yang lebih kecil dan memilih model berdasarkan stabilitas Macro-F1 serta threshold pada repeated OOF. Submisi publik terbaik yang tercatat adalah \texttt{submission\_best\_scratch\_v4.csv} dengan skor 0.89837, diikuti 0.88735 (submisi ID-aware v2-plus), 0.86571 (weighted CART), 0.85409 (CART robust), dan 0.84573 (baseline pertama).
 
 \section{Problem Overview}
 
 Kompetisinya adalah \emph{AI Lab Recruitment Task 2}, klasifikasi biner tabular untuk kelayakan pinjaman. Setiap baris berisi karakteristik pemohon seperti \texttt{person\_age}, \texttt{person\_income}, \texttt{person\_home\_ownership}, \texttt{person\_emp\_length}, \texttt{loan\_amnt}, \texttt{loan\_int\_rate}, \texttt{loan\_percent\_income}, \texttt{credit\_score}, dan \texttt{previous\_loan\_defaults\_on\_file}. Targetnya \texttt{loan\_status} bernilai 0 atau 1 dengan kelas positif sebagai minoritas. Kompetisi memakai macro F1, rata rata F1 kelas 0 dan kelas 1, jadi performa di kelas mayoritas saja tidak cukup.
 
 Aturannya tegas. Ketiga algoritma harus from scratch dan hanya boleh memakai library komputasi matematis seperti NumPy. Pandas hanya untuk membaca tabel, matplotlib untuk visualisasi, dan scikit-learn hanya sebagai pembanding sekaligus penyedia metrik. Tidak boleh ada ensemble method atau algoritma di luar yang disebutkan untuk submisi. File submisi harus berisi \texttt{person\_id} dan \texttt{loan\_status} dengan urutan identik terhadap test.
+
+\subsection{Data dan Preprocessing}
+
+Dataset terdiri dari data train berlabel, data test tanpa label, dan template submisi. Kolom
+\texttt{loan\_status} hanya digunakan sebagai target pada train, sedangkan \texttt{person\_id}
+disimpan terpisah sebagai identifier untuk menjaga urutan submisi. Fitur kategorikal diubah menjadi
+representasi numerik secara manual menggunakan preprocessor scratch, sementara fitur numerik
+dinormalisasi menggunakan statistik yang dipelajari dari data train pada fold terkait. Dengan demikian,
+statistik preprocessing tidak dihitung dari validation fold atau test.
+
+Pada pipeline utama, fitur yang dipakai tanpa \texttt{person\_id} mencakup fitur demografis,
+finansial, dan riwayat kredit. Logistic Regression dan SVM juga diuji dengan feature expansion
+berbasis quantile serta interaksi kategori yang target-independent. Ekspansi tersebut tetap menjadi
+bagian dari preprocessing; model akhirnya tetap Logistic Regression atau linear SVM. Cabang ID-aware
+diperlakukan sebagai eksperimen sensitivitas terpisah dan tidak dicampur dengan hasil baseline yang
+tidak memakai identifier.
 
 \section{Decision Tree Learning}
 
@@ -99,7 +115,33 @@ Strategi validasi naik bertahap. Baseline awal memakai stratified holdout 80/20 
 
 Macro F1 sensitif terhadap threshold. Threshold default 0.5 untuk LR dan 0.0 untuk SVM tidak selalu optimal, apalagi dengan kelas tidak seimbang. Saya menulis fungsi exact threshold optimization yang menyortir skor OOF lalu menghitung macro F1 kumulatif dalam $O(n\log n)$, dan memilih threshold yang memaksimalkan macro F1. Dua atau tiga kandidat konfigurasi terbaik dari tuning seed tunggal lalu diuji ulang pada tiga seed CV (42, 2026, 777), dan pemenangnya dipilih dari rata rata repeated OOF macro F1 dengan threshold diambil dari median antar repeat.
 
-Hasil lokal dan leaderboard publik cukup konsisten. Pada validasi OOF, varian ID-aware CART keluar sebagai yang terbaik. V4 membekukan varian tersebut melalui repeated OOF dan menghasilkan \texttt{submission\_best\_scratch\_v4\_90plus.csv}; skor publik v4 belum saya klaim karena belum tersedia pada catatan eksperimen. Perbandingan skor publik yang sudah tercatat ada di Tabel~\ref{tab:lb}.
+Hasil lokal dan leaderboard publik digunakan untuk tujuan yang berbeda. OOF dipakai untuk memilih model,
+hyperparameter, dan threshold, sedangkan leaderboard hanya dipakai sebagai evaluasi eksternal setelah
+konfigurasi dibekukan. Pada validasi OOF, varian ID-aware CART keluar sebagai kandidat terbaik. V4
+membekukan varian tersebut melalui repeated OOF dan menghasilkan
+\texttt{submission\_best\_scratch\_v4.csv}. Submission ini memperoleh skor publik 0.89837.
+Perbandingan seluruh skor publik yang sudah tercatat ada di
+Tabel~\ref{tab:lb}.
+
+Ringkasan perubahan antarversi ditunjukkan pada Tabel~\ref{tab:versions}. Nilai OOF yang tidak
+tersimpan sebagai output final notebook sengaja tidak direkonstruksi dari leaderboard.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{l l X X}
+\toprule
+\textbf{Versi} & \textbf{Fitur} & \textbf{Perubahan utama} & \textbf{Dasar evaluasi} \\
+\midrule
+v1 & Tanpa \texttt{person\_id} & Pipeline robust, exact CART split, threshold OOF, dan repeated CV & Baseline bebas leakage; skor publik 0.84573 \\
+v2 & Tanpa \texttt{person\_id} & Cost-sensitive CART dengan positive-class weight & Skor publik weighted CART 0.86571 \\
+v3 & Dengan \texttt{person\_id} & Audit source-order dan eksperimen ID-aware sebagai sensitivity analysis & Skor publik 0.88735 pada submisi v2-plus \\
+v4 & Dengan \texttt{person\_id} & Leaf lebih kecil, repeated OOF, dan audit stabilitas threshold & Skor publik 0.89837 pada \texttt{submission\_best\_scratch\_v4.csv} \\
+\bottomrule
+\end{tabularx}
+\caption{Perkembangan pipeline eksperimen dari v1 sampai v4.}
+\label{tab:versions}
+\end{table}
 
 \begin{table}[h]
 \centering
@@ -109,7 +151,7 @@ Hasil lokal dan leaderboard publik cukup konsisten. Pada validasi OOF, varian ID
 \textbf{Submisi} & \textbf{Model} & \textbf{Skor Publik} \\
 \midrule
 submission\_best\_scratch\_v2\_plus.csv & CART scratch dengan person\_id & 0.88735 \\
-submission\_best\_scratch\_v4\_90plus.csv & CART scratch ID-aware, threshold-stable & belum tercatat \\
+submission\_best\_scratch\_v4.csv & CART scratch ID-aware, threshold-stable & 0.89837 \\
 submission\_best\_scratch\_weighted\_cart\_v2.csv & Weighted CART scratch & 0.86571 \\
 submission\_best\_scratch\_robust.csv & CART scratch robust no leakage & 0.85409 \\
 submission\_cart\_scratch.csv & CART scratch baseline & 0.84573 \\
@@ -119,7 +161,15 @@ submission\_cart\_scratch.csv & CART scratch baseline & 0.84573 \\
 \label{tab:lb}
 \end{table}
 
-Satu hal yang perlu saya akui di write-up adalah audit train-only di v3 menunjukkan \texttt{person\_id} membawa struktur urutan yang kuat terhadap target, seperti terlihat di Gambar~\ref{fig:id}. Binning ID dengan lebar tetap menampilkan positive rate yang melompat antar blok. Eksperimen ID-aware lahir dari situ sebagai sensitivity analysis dan terbukti paling tinggi baik di OOF maupun leaderboard. Peningkatan ini bukan bukti bahwa ID adalah faktor kredit yang sah, melainkan bahwa split dataset ini mengandung source-order signal. Tidak ada aturan manual seperti \texttt{if person\_id > X then 1}; split terhadap ID murni dipelajari sendiri oleh CART.
+Satu hal yang perlu saya akui di write-up adalah audit train-only di v3 menunjukkan \texttt{person\_id}
+membawa struktur urutan yang kuat terhadap target, seperti terlihat di Gambar~\ref{fig:id}. Binning
+ID dengan lebar tetap menampilkan positive rate yang melompat antar blok. Eksperimen ID-aware lahir
+dari situ sebagai sensitivity analysis. V4 kemudian menghasilkan skor publik tertinggi yang tercatat,
+yaitu 0.89837 pada \texttt{submission\_best\_scratch\_v4.csv}, setelah sebelumnya submisi v2-plus
+mencapai 0.88735. Peningkatan ini bukan bukti bahwa ID adalah faktor kredit yang sah,
+melainkan indikasi bahwa split dataset ini mengandung source-order signal. Tidak ada aturan manual
+seperti \texttt{if person\_id > X then 1}; split terhadap ID murni dipelajari sendiri oleh CART.
+Generalisasi hasil ini ke data dengan ID yang diacak ulang tidak dapat diasumsikan.
 
 \begin{figure}[h]
 \centering
@@ -165,7 +215,13 @@ Alur kerjanya adalah \texttt{m} menjadi semacam momentum yang meredam osilasi, s
 
 \subsection{Gambar Percabangan Tree}
 
-Gambar~\ref{fig:tree} adalah hasil rendering struktur \texttt{tree\_} yang dihasilkan langsung oleh kelas \texttt{CARTClassifierScratch} dari v2. Karena data kompetisi tidak bisa dibawa keluar dari Kaggle, gambar ini dibuat dengan menjalankan ulang kelas yang sama pada data dengan skema yang identik agar tetap dapat direproduksi secara lokal. Tampak pohon memilih split pertama pada \texttt{loan\_percent\_income}, lalu bercabang ke \texttt{credit\_score} dan \texttt{loan\_int\_rate}, konsisten dengan feature importance yang dihitung implementasi.
+Gambar~\ref{fig:tree} adalah hasil rendering struktur \texttt{tree\_} dari varian CART berbobot
+dengan skema fitur yang identik. Karena data kompetisi tidak bisa dibawa keluar dari Kaggle, gambar
+ini dibuat dengan menjalankan ulang kelas yang sama pada data dengan skema yang identik agar tetap
+dapat direproduksi secara lokal. Pada contoh tersebut, split pertama menggunakan fitur rasio
+pendapatan terhadap pinjaman (ditampilkan sebagai \texttt{loan/inc}), kemudian bercabang ke fitur
+credit score dan interest rate. Gambar ini merupakan ilustrasi struktur model, bukan klaim bahwa
+setiap split tersebut sama persis dengan pohon final ID-aware v4.
 
 \begin{figure}[h]
 \centering
