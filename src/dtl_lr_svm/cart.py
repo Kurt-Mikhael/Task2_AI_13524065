@@ -9,6 +9,7 @@ class CARTClassifierScratch:
         min_samples_leaf=15,
         max_thresholds=None,
         max_features=None,
+        positive_class_weight=1.0,
         random_state=42,
     ):
         self.max_depth = max_depth
@@ -16,13 +17,18 @@ class CARTClassifierScratch:
         self.min_samples_leaf = min_samples_leaf
         self.max_thresholds = max_thresholds
         self.max_features = max_features
+        self.positive_class_weight = float(positive_class_weight)
         self.random_state = random_state
 
-    @staticmethod
-    def _gini_from_positive_count(positive_count, n_samples):
+    def _gini_from_positive_count(self, positive_count, n_samples):
         if n_samples <= 0:
             return 0.0
-        p = positive_count / n_samples
+        positive_weight = self.positive_class_weight * positive_count
+        negative_weight = n_samples - positive_count
+        total_weight = positive_weight + negative_weight
+        if total_weight <= 0:
+            return 0.0
+        p = positive_weight / total_weight
         return 2.0 * p * (1.0 - p)
 
     def fit(self, X, y):
@@ -39,7 +45,11 @@ class CARTClassifierScratch:
         return self
 
     def _make_leaf(self, indices):
-        probability = float(self.y_[indices].mean()) if len(indices) else 0.0
+        positive = float(self.y_[indices].sum()) if len(indices) else 0.0
+        negative = float(len(indices)) - positive
+        positive_weight = self.positive_class_weight * positive
+        total_weight = positive_weight + negative
+        probability = positive_weight / total_weight if total_weight > 0 else 0.0
         return {
             "is_leaf": True,
             "probability": probability,
@@ -59,7 +69,11 @@ class CARTClassifierScratch:
     def _best_split(self, indices):
         y_node = self.y_[indices]
         n_node = len(indices)
-        parent_gini = self._gini_from_positive_count(y_node.sum(), n_node)
+        total_positive = float(y_node.sum())
+        parent_weight = (
+            self.positive_class_weight * total_positive + n_node - total_positive
+        )
+        parent_gini = self._gini_from_positive_count(total_positive, n_node)
         best_gain = 0.0
         best_split = None
 
@@ -92,13 +106,18 @@ class CARTClassifierScratch:
             positive_left = cumulative_positive[candidate_positions]
             positive_right = cumulative_positive[-1] - positive_left
 
-            p_left = positive_left / n_left
-            p_right = positive_right / n_right
+            weighted_positive_left = self.positive_class_weight * positive_left
+            weighted_positive_right = self.positive_class_weight * positive_right
+            weight_left = weighted_positive_left + n_left - positive_left
+            weight_right = weighted_positive_right + n_right - positive_right
+            p_left = weighted_positive_left / weight_left
+            p_right = weighted_positive_right / weight_right
             gini_left = 2.0 * p_left * (1.0 - p_left)
             gini_right = 2.0 * p_right * (1.0 - p_right)
 
             gains = parent_gini - (
-                (n_left / n_node) * gini_left + (n_right / n_node) * gini_right
+                (weight_left / parent_weight) * gini_left
+                + (weight_right / parent_weight) * gini_right
             )
 
             local_best = int(np.argmax(gains))
@@ -125,8 +144,9 @@ class CARTClassifierScratch:
         return best_split
 
     def _grow(self, indices, depth):
+        depth_stop = self.max_depth is not None and depth >= self.max_depth
         stopping_condition = (
-            depth >= self.max_depth
+            depth_stop
             or len(indices) < self.min_samples_split
             or np.unique(self.y_[indices]).size == 1
         )
@@ -138,7 +158,9 @@ class CARTClassifierScratch:
             return self._make_leaf(indices)
 
         feature_index, threshold, left_indices, right_indices, gain = split
-        self.feature_importances_[feature_index] += gain * len(indices)
+        positive = float(self.y_[indices].sum())
+        node_weight = self.positive_class_weight * positive + len(indices) - positive
+        self.feature_importances_[feature_index] += gain * node_weight
 
         return {
             "is_leaf": False,
@@ -167,5 +189,5 @@ class CARTClassifierScratch:
         )
         return np.column_stack([1.0 - positive_probability, positive_probability])
 
-    def predict(self, X):
-        return (self.predict_proba(X)[:, 1] >= 0.5).astype(int)
+    def predict(self, X, threshold=0.5):
+        return (self.predict_proba(X)[:, 1] >= threshold).astype(int)
